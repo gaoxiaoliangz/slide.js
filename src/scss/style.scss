@@ -1,0 +1,21 @@
+body {
+  h1 {
+    margin: 50px 0;
+    font-size: 30px;
+  }
+  .container {
+    width: 800px;
+    margin: 0 auto;
+    .content {
+      font-size: 18px;
+      line-height: 1.7;
+    }
+  }
+}
+
+
+@media (max-width: 600px) {
+  body .container {
+    width: 100%;
+  }
+}

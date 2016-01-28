@@ -1,0 +1,46 @@
+doctype html
+html
+  head
+    title Slider Example
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
+    meta(name="viewport" content="target-densitydpi=device-dpi, width=device-width, user-scalable=no")
+
+    link(rel="stylesheet" href="../lib/normalize.css")
+    link(rel="stylesheet" href="../dist/css/slider.min.css")
+    link(rel="stylesheet" href="style.css")
+
+  body
+    .container
+      .show
+        .slide
+          img(src="pictures/1.jpg")
+        .slide
+          img(src="pictures/2.jpg")
+        .slide
+          img(src="pictures/3.jpg")
+          
+      .show2
+        .slide
+          img(src="pictures/1.jpg")
+        .slide
+          img(src="pictures/2.jpg")
+        .slide
+          img(src="pictures/3.jpg")
+
+
+    script(src="../lib/jquery/jquery.min.js")
+    script(src="../dist/js/slider.min.js")
+    script.
+      var slider = Slider(".show",{
+        hasDotNav: true,
+        hasArrowNav: true,
+        autoplay: true,
+        animationTime: 300
+      });
+
+      var slider2 = Slider(".show2",{
+        hasDotNav: true,
+        hasArrowNav: true,
+        autoplay: true
+      });
