@@ -13,7 +13,7 @@ Slider(".your-slider-class",{
 Or you can you use Outliner in the jQuery style
 
 ```
-$(".content").slider({
+$(".your-slider-class").slider({
   autoplay: true
 })
 ```
