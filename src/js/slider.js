@@ -1,4 +1,4 @@
-/* slider.js v0.1.0, (c) 2016 Gao Liang. - https://github.com/gaoxiaoliangz/slider
+/* slider.js v0.2.0, (c) 2016 Gao Liang. - https://github.com/gaoxiaoliangz/slider
  * @license MIT */
 
 ;(function(root, factory) {
@@ -42,14 +42,20 @@
       s.autoplayIndex = 0;
       s.autoplaySlides;
       s.translateX = (!Slider.isIE(8)?true:false);
+      s.touchstartX = 0;
 
       s.config = {
-        hasDotNav: (config.hasDotNav === undefined?true:config.hasDotNav),
-        hasArrowNav: (config.hasArrowNav === undefined?true:config.hasArrowNav),
-        autoplay: (config.autoplay === undefined?true:config.autoplay),
-        autoplayInterval: config.autoplayInterval || 4000,
-        aspectRatio: config.aspectRatio || 8/5,
-        animationTime: config.animationTime || 500
+        hasDotNav: true,
+        hasArrowNav: true,
+        autoplay: true,
+        autoplayInterval: 4000,
+        aspectRatio: 8/5,
+        animationTime: 500,
+        swipeThresholdWidth: 0.2
+      }
+
+      for(option in config){
+        s.config[option] = config[option];
       }
 
       s.buildDom();
@@ -58,6 +64,52 @@
       $(window).resize(function(){
         s.setSliderSize(s);
       });
+
+      $slider[0].addEventListener("touchstart", function(e){
+        s.handleTouch(e, s)
+      });
+      $slider[0].addEventListener("touchmove", function(e){
+        s.handleTouch(e, s)
+      });
+      $slider[0].addEventListener("touchend", function(e){
+        s.handleTouch(e, s)
+      });
+    },
+    handleTouch:function(e, context){
+      var touches = e.changedTouches;
+      var x = touches[0].pageX;
+      var y = touches[0].pageY;
+      var s = context;
+      var $slider = s.slider;
+
+      if(e.type === "touchstart"){
+        s.touchstartX = x;
+      }
+      if(e.type === "touchend"){
+        var dist = x - s.touchstartX;
+        if(dist > s.width*s.config.swipeThresholdWidth){
+          if(s.activeIndex === 0){
+            s.slideTo(s.activeIndex);
+          }else{
+            s.slideToPrev();
+          }
+        }else if(dist < -s.width*s.config.swipeThresholdWidth){
+          if(s.activeIndex === s.length-1){
+            s.slideTo(s.activeIndex);
+          }else{
+            s.slideToNext();
+          }
+        }else{
+          s.slideTo(s.activeIndex);
+        }
+        s.touchstartX = 0;
+      }
+      if(e.type === "touchmove"){
+        for(var i = 0;i < s.length;i++){
+          var left = (i-s.activeIndex)*s.width+(x-s.touchstartX);
+          s.setSlidePosition(i, left, false);
+        }
+      }
     },
     buildDom:function(){
       var s = this;
@@ -133,9 +185,32 @@
         },s.config.autoplayInterval);
       }
     },
+    setSlidePosition:function(index, left, isAnimated){
+      var s = this;
+      var $slider = s.slider;
+      var transition;
+
+      if(isAnimated === true){
+        transition = "all "+s.config.animationTime+"ms";
+      }else{
+        transition = "all 0ms";
+      }
+
+      if(s.translateX){
+        $slider.find(".slides .slide").eq(index).css({
+          transform: "translateX("+left+"px)",
+          transition: transition
+        });
+      }else{
+        $slider.find(".slides .slide").eq(index).css({
+          left: left,
+          transition: transition
+        });
+      }
+    },
     slideTo:function(index){
       var s = this;
-      $slider = s.slider;
+      var $slider = s.slider;
 
       if(index > s.length-1){
         index = 0;
@@ -143,28 +218,15 @@
         index = s.length-1;
       }
 
-      if(s.activeIndex !== index){
-        for(var i = 0;i < s.length;i++){
-          var left = (i-index)*s.width;
-          if(s.translateX){
-            $slider.find(".slides .slide").eq(i).css({
-              transform: "translateX("+left+"px)",
-              transition: "all "+s.config.animationTime+"ms"
-            });
-          }else{
-            $slider.find(".slides .slide").eq(i).css({
-              left: left,
-              transition: "all "+s.config.animationTime+"ms"
-            });
-          }
+      for(var i = 0;i < s.length;i++){
+        var left = (i-index)*s.width;
+        s.setSlidePosition(i, left, true);
+      }
+      s.activeIndex = index;
+      $slider.find(".slides .slide").removeClass("active").eq(index).addClass("active");
 
-        }
-        s.activeIndex = index;
-        $slider.find(".slides .slide").removeClass("active").eq(index).addClass("active");
-
-        if(s.config.hasDotNav){
-          $slider.find(".dot-nav li").removeClass("active").eq(index).addClass("active");
-        }
+      if(s.config.hasDotNav){
+        $slider.find(".dot-nav li").removeClass("active").eq(index).addClass("active");
       }
     },
     slideToNext:function(){

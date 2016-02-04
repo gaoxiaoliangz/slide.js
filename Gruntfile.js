@@ -13,7 +13,6 @@ module.exports = function(grunt) {
         }
       }
     },
-
     uglify: {
       options: {
         sourceMap: true,
@@ -25,7 +24,6 @@ module.exports = function(grunt) {
         }
       }
     },
-
     sass: {
       dist: {
         options: {
@@ -45,7 +43,6 @@ module.exports = function(grunt) {
         }
       }
     },
-
     jade: {
       compile: {
         options: {
@@ -58,21 +55,7 @@ module.exports = function(grunt) {
         }
       }
     },
-
     image: {
-      static: {
-        options: {
-          pngquant: true,
-          optipng: false,
-          zopflipng: true,
-          advpng: true,
-          jpegRecompress: false,
-          jpegoptim: true,
-          mozjpeg: true,
-          gifsicle: true,
-          svgo: true
-        }
-      },
       dynamic: {
         files: [{
           expand: true,
@@ -82,7 +65,6 @@ module.exports = function(grunt) {
         }]
       }
     },
-
     watch: {
       css: {
         files: ['*/*.scss','src/scss/*.scss'],
