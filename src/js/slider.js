@@ -159,7 +159,7 @@
       var s = context;
       var $slider = s.slider;
 
-      s.width = $slider.parent().width();
+      s.width = $slider.width();
       s.height = s.width/s.config.aspectRatio;
 
       for(var i = 0;i < s.length;i++){
