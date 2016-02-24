@@ -4,6 +4,19 @@ body h1 {
 body .container {
   width: 800px;
   margin: 0 auto; }
+body .container .slides .s1, body .container .slides .s2, body .container .slides .s3, body .container .slides .s4, body .container .slides .s5 {
+  width: 100%;
+  height: 500px; }
+body .container .slides .s1 {
+  background: #d17312; }
+body .container .slides .s2 {
+  background: #70b61e; }
+body .container .slides .s3 {
+  background: #2656b3; }
+body .container .slides .s4 {
+  background: #241569; }
+body .container .slides .s5 {
+  background: #6c25b3; }
 body .container .content {
   font-size: 18px;
   line-height: 1.7; }

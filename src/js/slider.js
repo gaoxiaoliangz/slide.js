@@ -43,6 +43,14 @@
       s.autoplaySlides;
       s.translateX = (!Slider.isIE(8)?true:false);
       s.touchstartX = 0;
+      s.classNames = {
+        slide: 'slide',
+        wrap: 'slides',
+        outer: 'slider-wrap',
+        prevSlide: 'slide-prev',
+        nextSlide: 'slide-next'
+      }
+      s.name = 'slider'
 
       s.config = {
         hasDotNav: true,
@@ -51,10 +59,19 @@
         autoplayInterval: 4000,
         aspectRatio: 8/5,
         animationTime: 500,
-        swipeThresholdWidth: 0.2
+        swipeThresholdWidth: 0.2,
+        style: 'flat', // flat | cubic
+        infinite: true
       }
 
       for(option in config){
+        if(option === 'style'){
+          console.log(typeof config[option])
+          if(['flat','cubic'].indexOf(config[option]) === -1){
+            console.error('Style undefined, default style will be applied')
+            continue
+          }
+        }
         s.config[option] = config[option];
       }
 
@@ -62,7 +79,7 @@
       s.autoplay();
 
       $(window).resize(function(){
-        s.setSliderSize(s);
+        s.setSliderStyle(s);
       });
 
       $slider[0].addEventListener("touchstart", function(e){
@@ -117,12 +134,12 @@
 
       // prepare slides
       $slider
-        .addClass("slider-wrap")
-        .append("<div class='slides'></div>")
-        .find(".slides").append($slider.find(".slide"))
-        .find(".slides .slide").eq(s.activeIndex).addClass("active");
+        .addClass(s.classNames.outer+" "+s.name+"-"+s.config.style)
+        .append("<div class='"+s.classNames.wrap+"'></div>")
+        .find("."+s.classNames.wrap).append($slider.find("."+s.classNames.slide))
+        .find("."+s.classNames.slide).eq(s.activeIndex).addClass("active");
 
-      s.setSliderSize(s);
+      s.setSliderStyle(s);
 
       // dot nav
       if(s.config.hasDotNav){
@@ -155,22 +172,19 @@
           });
       }
     },
-    setSliderSize:function(context){
+    setSliderStyle:function(context){
       var s = context;
       var $slider = s.slider;
+      var $slides = $slider.find(".slide")
 
       s.width = $slider.width();
       s.height = s.width/s.config.aspectRatio;
 
-      for(var i = 0;i < s.length;i++){
-        var left = i*s.width;
-        if(s.translateX){
-          $slider.find(".slides .slide").eq(i).css({transform: "translateX("+left+"px)"});
-        }else{
-          $slider.find(".slides .slide").eq(i).css({left: left});
-        }
-      }
+      s._setSlidesPosition(s.activeIndex)
+
       $slider.find(".slides .slide,.slides").width(s.width).height(s.height);
+      $slides.removeClass(s.classNames.prevSlide).eq(s.activeIndex-1).addClass(s.classNames.prevSlide)
+      $slides.removeClass(s.classNames.nextSlide).eq(s.activeIndex+1).addClass(s.classNames.nextSlide)
     },
     autoplay:function(){
       var s = this;
@@ -196,21 +210,37 @@
         transition = "all 0ms";
       }
 
-      if(s.translateX){
-        $slider.find(".slides .slide").eq(index).css({
-          transform: "translateX("+left+"px)",
-          transition: transition
-        });
-      }else{
-        $slider.find(".slides .slide").eq(index).css({
-          left: left,
-          transition: transition
-        });
+      if(s.config.style === 'flat'){
+        if(s.translateX){
+          $slider.find(".slides .slide").eq(index).css({
+            transform: "translateX("+left+"px)",
+            transition: transition
+          });
+        }else{
+          $slider.find(".slides .slide").eq(index).css({
+            left: left,
+            transition: transition
+          });
+        }
+      }
+      if(s.config.style === 'cubic'){
+        if(s.activeIndex === index){
+          $slider.find(".slides .slide").eq(index).css({
+            transform: "translateX("+left+"px) scale(1.7,1.7)",
+            transition: transition
+          });
+        }else{
+          $slider.find(".slides .slide").eq(index).css({
+            transform: "translateX("+left+"px) scale(1,1)",
+            transition: transition
+          });
+        }
       }
     },
     slideTo:function(index){
       var s = this;
       var $slider = s.slider;
+      var $slides = $slider.find(".slides .slide")
 
       if(index > s.length-1){
         index = 0;
@@ -218,16 +248,16 @@
         index = s.length-1;
       }
 
-      for(var i = 0;i < s.length;i++){
-        var left = (i-index)*s.width;
-        s.setSlidePosition(i, left, true);
-      }
       s.activeIndex = index;
-      $slider.find(".slides .slide").removeClass("active").eq(index).addClass("active");
+      $slides.removeClass("active").eq(index).addClass("active");
+      $slides.removeClass(s.classNames.prevSlide).eq(index-1).addClass(s.classNames.prevSlide);
+      $slides.removeClass(s.classNames.nextSlide).eq(index+1).addClass(s.classNames.nextSlide);
 
       if(s.config.hasDotNav){
         $slider.find(".dot-nav li").removeClass("active").eq(index).addClass("active");
       }
+      s._setSlidesPosition(index);
+
     },
     slideToNext:function(){
       var s = this;
@@ -237,6 +267,26 @@
       var s = this;
       s.slideTo(s.activeIndex-1);
     },
+    _setSlidesPosition:function(activeIndex){
+      var s = this
+      var k
+      var left
+      if(s.config.infinite){
+        for(var i = 0;i < s.length;i++){
+          left = (i-1)*s.width
+          k = activeIndex + i - 1;
+          if(k>s.length-1){
+            k = k - s.length
+          }
+          s.setSlidePosition(k, left, true);
+        }
+      }else{
+        for(var i = 0;i < s.length;i++){
+          left = (i-activeIndex)*s.width
+          s.setSlidePosition(i, left, true);
+        }
+      }
+    }
   };
   Slider.prototype.init.prototype = Slider.prototype;
 

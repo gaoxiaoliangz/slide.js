@@ -14,13 +14,25 @@ html
     .container
       .show
         .slide
+          .s1
+        .slide
+          .s2
+        .slide
+          .s3
+        .slide
+          .s4
+        .slide
+          .s5
+          
+      .show2
+        .slide
           img(src="pictures/1.jpg")
         .slide
           img(src="pictures/2.jpg")
         .slide
           img(src="pictures/3.jpg")
           
-      .show2
+      .show3
         .slide
           img(src="pictures/1.jpg")
         .slide
@@ -32,15 +44,28 @@ html
     script(src="../lib/jquery/jquery.min.js")
     script(src="../dist/js/slider.min.js")
     script.
-      var slider = Slider(".show",{
+      var slider = new Slider(".show",{
         hasDotNav: true,
         hasArrowNav: true,
         autoplay: false,
-        animationTime: 300
-      });
-
-      var slider2 = Slider(".show2",{
+        animationTime: 300,
+        style: 'cubic',
+      })
+      
+      var slider2 = new Slider(".show2",{
         hasDotNav: true,
         hasArrowNav: true,
-        autoplay: true
+        autoplay: true,
+        style: 'cubic'
       });
+      
+      var slider3 = new Slider(".show3",{
+        hasDotNav: true,
+        hasArrowNav: true,
+        autoplay: true,
+        infinite: false
+      });
+      
+      //- setInterval(function(){
+      //-   slider.slideToNext()
+      //- },200)
