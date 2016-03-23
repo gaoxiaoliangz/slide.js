@@ -6,6 +6,9 @@ body {
   .container {
     width: 800px;
     margin: 0 auto;
+    img {
+      max-width: 100%;
+    }
     .slides {
       .s1,.s2,.s3,.s4,.s5 {
         width: 100%;

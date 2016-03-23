@@ -4,6 +4,8 @@ body h1 {
 body .container {
   width: 800px;
   margin: 0 auto; }
+body .container img {
+  max-width: 100%; }
 body .container .slides .s1, body .container .slides .s2, body .container .slides .s3, body .container .slides .s4, body .container .slides .s5 {
   width: 100%;
   height: 500px; }
@@ -24,3 +26,5 @@ body .container .content {
 @media (max-width: 600px) {
   body .container {
     width: 100%; } }
+
+/*# sourceMappingURL=style.css.map */

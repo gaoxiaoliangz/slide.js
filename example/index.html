@@ -1,25 +1,75 @@
-<!DOCTYPE html><html><head><title>Slider Example</title><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, user-scalable=no"><link rel="stylesheet" href="../lib/normalize.css"><link rel="stylesheet" href="../dist/css/slider.min.css"><link rel="stylesheet" href="style.css"></head><body><div class="container"><div class="show"><div class="slide"><div class="s1"></div></div><div class="slide"><div class="s2"></div></div><div class="slide"><div class="s3"></div></div><div class="slide"><div class="s4"></div></div><div class="slide"><div class="s5"></div></div></div><div class="show2"><div class="slide"><img src="pictures/1.jpg"></div><div class="slide"><img src="pictures/2.jpg"></div><div class="slide"><img src="pictures/3.jpg"></div></div><div class="show3"><div class="slide"><img src="pictures/1.jpg"></div><div class="slide"><img src="pictures/2.jpg"></div><div class="slide"><img src="pictures/3.jpg"></div></div></div><script src="../lib/jquery/jquery.min.js"></script><script src="../dist/js/slider.min.js"></script><script>var slider = new Slider(".show",{
-  hasDotNav: true,
-  hasArrowNav: true,
-  autoplay: false,
-  animationTime: 300,
-  style: 'cubic',
-})
+<!DOCTYPE html>
+<html>
 
-var slider2 = new Slider(".show2",{
-  hasDotNav: true,
-  hasArrowNav: true,
-  autoplay: true,
-  style: 'cubic'
-});
+<head>
+  <title>Slider Example</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, user-scalable=no">
+  <link rel="stylesheet" href="assets/css/normalize.css">
+  <link rel="stylesheet" href="assets/css/slider.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
 
-var slider3 = new Slider(".show3",{
-  hasDotNav: true,
-  hasArrowNav: true,
-  autoplay: true,
-  infinite: false
-});
+<body>
+  <div class="container">
+    <div class="show">
+      <div class="slide">
+        <div class="s1"></div>
+      </div>
+      <div class="slide">
+        <div class="s2"></div>
+      </div>
+      <div class="slide">
+        <div class="s3"></div>
+      </div>
+      <div class="slide">
+        <div class="s4"></div>
+      </div>
+      <div class="slide">
+        <div class="s5"></div>
+      </div>
+    </div>
+    <div class="show2">
+      <div class="slide"><img src="pics/1.jpg"></div>
+      <div class="slide"><img src="pics/2.jpg"></div>
+      <div class="slide"><img src="pics/3.jpg"></div>
+    </div>
+    <div class="show3">
+      <div class="slide"><img src="pics/1.jpg"></div>
+      <div class="slide"><img src="pics/2.jpg"></div>
+      <div class="slide"><img src="pics/3.jpg"></div>
+    </div>
+  </div>
+  <!-- <script src="../lib/jquery/jquery.min.js"></script> -->
+  <script src="assets/js/slider.js"></script>
+  <script>
+    var slider = new Slider(".show", {
+      hasDotNav: true,
+      hasArrowNav: true,
+      autoplay: false,
+      animationTime: 300,
+      style: 'cubic',
+    })
 
-//- setInterval(function(){
-//-   slider.slideToNext()
-//- },200)</script></body></html>
+    var slider2 = new Slider(".show2", {
+      hasDotNav: true,
+      hasArrowNav: true,
+      autoplay: true,
+      style: 'cubic'
+    });
+
+    var slider3 = new Slider(".show3", {
+      hasDotNav: true,
+      hasArrowNav: true,
+      autoplay: true,
+      infinite: false
+    });
+
+    //- setInterval(function(){
+    //-   slider.slideToNext()
+    //- },200)
+  </script>
+</body>
+
+</html>
