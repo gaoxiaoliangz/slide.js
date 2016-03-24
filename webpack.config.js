@@ -1,41 +1,15 @@
-// var path = require("path");
-//
-// module.exports = {
-//     entry: "./dev/js/main.js",
-//     output: {
-//         path: "assets/js",
-//         filename: "index.js"
-//     },
-//     devtool: 'source-map',
-//     module: {
-//       loaders: [
-//           { test: /\.css$/, loader: "style-loader!css-loader" }
-//       ]
-//     },
-//     resolve: {
-//       root: path.resolve(__dirname),
-//       alias: {
-//         lib: "assets/lib",
-//         jQuery: "assets/lib/jquery/jquery.min.js"
-//       },
-//       extensions: ['', '.js', '.jsx']
-//     },
-// };
-
-
-
 var path = require('path')
 var webpack = require('webpack')
 var hot = 'webpack-hot-middleware/client'
 
 module.exports = {
   entry: {
-    index: [hot, './src/js/slider']
+    index: ['./src/js/index']
   },
   output: {
-    path: path.join(__dirname, 'public/debug/js'),
+    path: path.join(__dirname, 'example/assets/js'),
     filename: '[name].js',
-    publicPath: '/debug/js/'
+    publicPath: '/assets/js/'
   },
   plugins: [
     new webpack.optimize.OccurenceOrderPlugin(),

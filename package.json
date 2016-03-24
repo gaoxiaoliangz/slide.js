@@ -5,6 +5,11 @@
   "author": "gaoxiaoliangz",
   "license": "MIT",
   "homepage": "https://github.com/gaoxiaoliangz/slider#readme",
+  "scripts": {
+    "start": "node ./server",
+    "build-js": "BABEL_ENV=production grunt build-js",
+    "build": "BABEL_ENV=production grunt build"
+  },
   "devDependencies": {
     "babel-core": "^6.7.4",
     "babel-loader": "^6.2.4",

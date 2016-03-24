@@ -5,7 +5,7 @@
   <title>Slider Example</title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, user-scalable=no">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
   <link rel="stylesheet" href="assets/css/normalize.css">
   <link rel="stylesheet" href="assets/css/slider.css">
   <link rel="stylesheet" href="assets/css/style.css">
@@ -13,7 +13,12 @@
 
 <body>
   <div class="container">
-    <div class="show">
+    <div class="photos">
+      <div><img src="pics/1.jpg"></div>
+      <div><img src="pics/2.jpg"></div>
+      <div><img src="pics/3.jpg"></div>
+    </div>
+    <!-- <div class="show">
       <div class="slide">
         <div class="s1"></div>
       </div>
@@ -29,42 +34,38 @@
       <div class="slide">
         <div class="s5"></div>
       </div>
-    </div>
-    <div class="show2">
+    </div> -->
+
+    <!-- <div class="show3">
       <div class="slide"><img src="pics/1.jpg"></div>
       <div class="slide"><img src="pics/2.jpg"></div>
       <div class="slide"><img src="pics/3.jpg"></div>
-    </div>
-    <div class="show3">
-      <div class="slide"><img src="pics/1.jpg"></div>
-      <div class="slide"><img src="pics/2.jpg"></div>
-      <div class="slide"><img src="pics/3.jpg"></div>
-    </div>
+    </div> -->
   </div>
-  <!-- <script src="../lib/jquery/jquery.min.js"></script> -->
-  <script src="assets/js/slider.js"></script>
+  <script src="assets/js/jquery.min.js"></script>
+  <script src="assets/js/index.js"></script>
   <script>
-    var slider = new Slider(".show", {
-      hasDotNav: true,
-      hasArrowNav: true,
-      autoplay: false,
-      animationTime: 300,
-      style: 'cubic',
-    })
-
-    var slider2 = new Slider(".show2", {
-      hasDotNav: true,
-      hasArrowNav: true,
-      autoplay: true,
-      style: 'cubic'
-    });
-
-    var slider3 = new Slider(".show3", {
-      hasDotNav: true,
-      hasArrowNav: true,
-      autoplay: true,
-      infinite: false
-    });
+    // var slider = new Slider(".show", {
+    //   hasDotNav: true,
+    //   hasArrowNav: true,
+    //   autoplay: false,
+    //   animationTime: 300,
+    //   style: 'cubic',
+    // })
+    //
+    // var slider2 = new Slider(".show2", {
+    //   hasDotNav: true,
+    //   hasArrowNav: true,
+    //   autoplay: true,
+    //   style: 'cubic'
+    // });
+    //
+    // var slider3 = new Slider(".show3", {
+    //   hasDotNav: true,
+    //   hasArrowNav: true,
+    //   autoplay: true,
+    //   infinite: false
+    // });
 
     //- setInterval(function(){
     //-   slider.slideToNext()
