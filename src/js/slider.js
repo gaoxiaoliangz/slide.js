@@ -1,103 +1,114 @@
-/* slider.js v0.2.0, (c) 2016 Gao Liang. - https://github.com/gaoxiaoliangz/slider
- * @license MIT */
+import Util from "./util"
+import _D from "./dom"
 
-;(function(root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    define(factory);
-  } else if (typeof exports === 'object') {
-    module.exports = factory();
-  } else if (typeof jQuery === "undefined"){
-    console.error("Error:", "jQuery is needed to run Slider!");
-  }else {
-    root.Slider = factory(root);
-  }
-})(this, function(root) {
-  var version = "0.1.0";
-  var Slider = function(selector, config){
-    return new Slider.prototype.init(selector, config);
+const Slider = (() => {
+
+  const VERSION = "0.2.0"
+
+  const supportedStyles = {
+    default: "style-flat",
+    flat: "style-flat",
+    cubic: "style-cubic"
   }
 
-  Slider.isIE = function(ver){
-    var b = document.createElement('b')
-    b.innerHTML = '<!--[if IE ' + ver + ']><i></i><![endif]-->'
-    return b.getElementsByTagName('i').length === 1
+  const defaultConfig = {
+    hasDotNav: true,
+    hasArrowNav: true,
+    autoplay: true,
+    autoplayInterval: 3000,
+    aspectRatio: 8/5,
+    animationTime: 500,
+    swipeThresholdWidth: 0.2,
+    style: supportedStyles.default,
+    infinite: false
   }
 
-  Slider.lockScroll = function(){
-    $("body").css({"overflow": "hidden"});
+  const classNames = {
+    name: 'slider',
+    slide: 'slider-slide',
+    wrap: 'slider-wrap',
+    active: 'active',
+    container: 'slider-container',
+    prevSlide: 'slider-slide-prev',
+    nextSlide: 'slider-slide-next',
+    dotNav: 'slider-dot-nav',
+    arrowNav: 'slider-arrow-nav',
+    prev: 'slider-nav-prev',
+    next: 'slider-nav-next',
   }
 
-  Slider.unlockScroll = function(){
-    $("body").css({"overflow": "auto"});
-  }
+  const ZINDEX = 50
 
-  Slider.prototype = {
-    init:function(selector, config){
-      var s = this;
-      var $slider = s.slider = $(selector);
-      var $dotnav;
+  class Slider {
 
-      s.length = $slider.find(".slide").length;
-      s.activeIndex = 0;
-      s.autoplayIndex = 0;
-      s.autoplaySlides;
-      s.translateX = (!Slider.isIE(8)?true:false);
-      s.touchstartX = 0;
-      s.classNames = {
-        slide: 'slide',
-        wrap: 'slides',
-        outer: 'slider-wrap',
-        prevSlide: 'slide-prev',
-        nextSlide: 'slide-next'
-      }
-      s.name = 'slider'
+    static get version() {
+      return VERSION
+    }
 
-      s.config = {
-        hasDotNav: true,
-        hasArrowNav: true,
-        autoplay: true,
-        autoplayInterval: 4000,
-        aspectRatio: 8/5,
-        animationTime: 500,
-        swipeThresholdWidth: 0.2,
-        style: 'flat', // flat | cubic
-        infinite: true
-      }
+    constructor(selector, config) {
+      this.selector = selector
+      this.config = Object.assign({}, defaultConfig, config)
+      this.validateConfig(this.config)
 
-      for(option in config){
-        if(option === 'style'){
-          console.log(typeof config[option])
-          if(['flat','cubic'].indexOf(config[option]) === -1){
-            console.error('Style undefined, default style will be applied')
-            continue
+      this.sliderDom = document.querySelector(selector)
+      this.slides = document.querySelectorAll(`${selector}>div`)
+
+      this.length = this.slides.length;
+      this.activeIndex = 0;
+      this.autoplayIndex = 0;
+      this.autoplaySlides;
+      this.translateX = (!Util.isIE(8)?true:false);
+      this.touchstartX = 0;
+
+      this.buildDom()
+      this.setSliderSize()
+      this.addListeners()
+      this.setSlidesPosition(this.activeIndex)
+      this.autoplay()
+    }
+
+    addListeners(){
+      // arrow nav btn
+      Array.prototype.forEach.call(this.arrowNavBtn, function(ele, index) {
+        ele.addEventListener("click", function(e){
+          clearInterval(this.autoplaySlides)
+          if(index === 0){
+            this.slideToPrev()
+          } else if(index === 1){
+            this.slideToNext()
           }
-        }
-        s.config[option] = config[option];
-      }
+          e.preventDefault()
+        }.bind(this))
+      }.bind(this))
 
-      s.buildDom();
-      s.autoplay();
+      // dot nav btn
+      Array.prototype.forEach.call(this.dotNavBtn, function(ele, index) {
+        ele.addEventListener("click", function(e){
+          clearInterval(this.autoplaySlides)
+          this.slideTo(index)
+          e.preventDefault()
+        }.bind(this))
+      }.bind(this))
 
-      $(window).resize(function(){
-        s.setSliderStyle(s);
-      });
+      // touch support
+      this.sliderWrap.addEventListener("touchstart", function(e){
+        clearInterval(this.autoplaySlides)
+        this.handleTouch(e)
+      }.bind(this))
+      this.sliderWrap.addEventListener("touchmove", function(e){
+        this.handleTouch(e)
+      }.bind(this))
+      this.sliderWrap.addEventListener("touchend", function(e){
+        this.handleTouch(e)
+      }.bind(this))
+    }
 
-      $slider[0].addEventListener("touchstart", function(e){
-        s.handleTouch(e, s)
-      });
-      $slider[0].addEventListener("touchmove", function(e){
-        s.handleTouch(e, s)
-      });
-      $slider[0].addEventListener("touchend", function(e){
-        s.handleTouch(e, s)
-      });
-    },
-    handleTouch:function(e, context){
-      var touches = e.changedTouches;
-      var x = touches[0].pageX;
-      var y = touches[0].pageY;
-      var s = context;
-      var $slider = s.slider;
+    // todo
+    handleTouch(e) {
+      var touches = e.changedTouches,
+          x = touches[0].pageX,
+          y = touches[0].pageY,
+          s = this
 
       if(e.type === "touchstart"){
         s.touchstartX = x;
@@ -123,70 +134,154 @@
       }
       if(e.type === "touchmove"){
         for(var i = 0;i < s.length;i++){
-          var left = (i-s.activeIndex)*s.width+(x-s.touchstartX);
+          let left = (i-s.activeIndex)*s.width+(x-s.touchstartX);
           s.setSlidePosition(i, left, false);
         }
       }
-    },
-    buildDom:function(){
-      var s = this;
-      var $slider = s.slider;
+    }
+
+    validateConfig(config) {
+      let isStyleValid = false
+
+      // style
+      for(var prop in supportedStyles) {
+        if(supportedStyles[prop] === config.style) {
+          isStyleValid = true
+          break
+        }
+      }
+      if(!isStyleValid) {
+        config.style = supportedStyles.default
+      }
+
+      // todo: all the rest props
+    }
+
+    buildDom() {
+      var wrap = document.createElement("div")
+      var dotNav = document.createElement("nav")
+      var arrowNav = document.createElement("nav")
+
+      this.dotNav = dotNav
+      this.arrowNav = arrowNav
+      this.sliderWrap = wrap
 
       // prepare slides
-      $slider
-        .addClass(s.classNames.outer+" "+s.name+"-"+s.config.style)
-        .append("<div class='"+s.classNames.wrap+"'></div>")
-        .find("."+s.classNames.wrap).append($slider.find("."+s.classNames.slide))
-        .find("."+s.classNames.slide).eq(s.activeIndex).addClass("active");
-
-      s.setSliderStyle(s);
+      wrap.className = classNames.wrap
+      Array.prototype.forEach.call(this.slides, (slide, index)=> {
+        slide.className += ` ${classNames.slide}`
+        wrap.appendChild(slide)
+      })
+      this.sliderDom.className += ` ${classNames.container} ${classNames.name}-${this.config.style}`
+      this.sliderDom.appendChild(wrap)
 
       // dot nav
-      if(s.config.hasDotNav){
-        $slider.append("<nav class='dot-nav'><ul></ul></nav>");
-        $dotNav = s.dotNav = $slider.find(".dot-nav");
+      if(this.config.hasDotNav){
+        dotNav.className += ` ${classNames.dotNav}`
+        dotNav.innerHTML = "<ul></ul>"
+        this.sliderDom.appendChild(dotNav)
 
-        for(var i = 0;i < s.length;i++){
-          $dotNav.find("ul").append("<li><a href='#'></a></li>")
+        for(let i = 0;i < this.length;i++){
+          let dotNavLi = document.createElement("li")
+          dotNavLi.innerHTML = "<a href='#'></a>"
+          dotNav.querySelector("ul").appendChild(dotNavLi)
         }
-        $dotNav.on("click","li a",function(){
-          var index = $(this).parent().index();
-          s.slideTo(index);
-          clearInterval(s.autoplaySlides);
-          return false;
-        });
-        $dotNav.find("li").eq(s.activeIndex).addClass("active");
       }
+      this.dotNavLi = this.dotNav.querySelectorAll("li")
+      this.dotNavBtn = this.dotNav.querySelectorAll("a")
 
       // arrow nav
-      if(s.config.hasArrowNav){
-        $slider
-          .append("<nav class='arrow-nav'><ul><li class='slider-nav-prev'></li><li class='slider-nav-next'></li></ul></nav>")
-          .on("click",".slider-nav-next",function(){
-            s.slideToNext();
-            clearInterval(s.autoplaySlides);
-          })
-          .on("click",".slider-nav-prev",function(){
-            s.slideToPrev();
-            clearInterval(s.autoplaySlides);
-          });
+      if(this.config.hasArrowNav){
+        arrowNav.innerHTML = `<ul><li class=${classNames.prev}><a href="#"></a></li><li class=${classNames.next}><a href="#"></a></li></ul>`
+        arrowNav.className = classNames.arrowNav
+        this.sliderDom.appendChild(arrowNav)
       }
-    },
-    setSliderStyle:function(context){
-      var s = context;
-      var $slider = s.slider;
-      var $slides = $slider.find(".slide")
+      this.arrowNavBtn = this.arrowNav.querySelectorAll("a")
+    }
 
-      s.width = $slider.width();
-      s.height = s.width/s.config.aspectRatio;
+    setSliderSize() {
+      this.width = this.sliderDom.getBoundingClientRect().width
+      this.height = this.width/this.config.aspectRatio
 
-      s._setSlidesPosition(s.activeIndex)
+      _D(this.sliderWrap).width(this.width).height(this.height)
+      _D(this.slides).width(this.width).height(this.height)
+    }
 
-      $slider.find(".slides .slide,.slides").width(s.width).height(s.height);
-      $slides.removeClass(s.classNames.prevSlide).eq(s.activeIndex-1).addClass(s.classNames.prevSlide)
-      $slides.removeClass(s.classNames.nextSlide).eq(s.activeIndex+1).addClass(s.classNames.nextSlide)
-    },
-    autoplay:function(){
+    setSlidesPosition(activeIndex) {
+      this.setActive(activeIndex)
+
+      Array.prototype.forEach.call(this.slides, function(ele,index){
+        let offset = index - activeIndex
+        var left
+
+        if(this.config.infinite){
+          if(offset < -1){
+            offset = offset + this.length
+          }else if(offset > this.length-2){
+            offset = offset - this.length
+          }
+          left = offset * this.width
+        }else{
+          left = offset * this.width
+        }
+
+        this.setSlidePosition(index, left, offset, true);
+      }.bind(this))
+    }
+
+    // todo: z-index bug
+    setSlidePosition(index, left, offset, isAnimated) {
+      var transition = isAnimated?"all "+this.config.animationTime+"ms":"all 0ms"
+
+      this.slides[index].style.transition = transition
+
+      if(this.config.style === 'style-flat'){
+        let zIndex = ZINDEX - offset
+        this.slides[index].style.zIndex = zIndex
+        if(this.translateX) {
+          this.slides[index].style.transform = "translateX("+left+"px)"
+        }else{
+          this.slides[index].style.left = left
+        }
+      }
+
+      if(this.config.style === 'style-cubic') {
+        let zIndex = ZINDEX - Math.abs(offset)
+        this.slides[index].style.zIndex = zIndex
+        if(offset === 0){
+          this.slides[index].style.transform = "translateX("+left+"px) scale(1.7,1.7)"
+        }else{
+          this.slides[index].style.transform = "translateX("+left+"px) scale(1,1)"
+        }
+      }
+    }
+
+    setActive(index) {
+      this.activeIndex = index
+      _D(this.slides).removeClass(classNames.active).eq(index).addClass(classNames.active)
+      if(this.config.hasDotNav) {
+        _D(this.dotNavLi).removeClass(classNames.active).eq(index).addClass(classNames.active)
+      }
+    }
+
+    slideTo(index) {
+      if(index > this.length-1){
+        index = 0;
+      }else if(index < 0){
+        index = this.length-1;
+      }
+      this.setSlidesPosition(index)
+    }
+
+    slideToNext() {
+      this.slideTo(this.activeIndex+1)
+    }
+
+    slideToPrev() {
+      this.slideTo(this.activeIndex-1)
+    }
+
+    autoplay() {
       var s = this;
       if(s.config.autoplay){
         s.autoplaySlides = setInterval(function(){
@@ -198,101 +293,16 @@
           }
         },s.config.autoplayInterval);
       }
-    },
-    setSlidePosition:function(index, left, isAnimated){
-      var s = this;
-      var $slider = s.slider;
-      var transition;
-
-      if(isAnimated === true){
-        transition = "all "+s.config.animationTime+"ms";
-      }else{
-        transition = "all 0ms";
-      }
-
-      if(s.config.style === 'flat'){
-        if(s.translateX){
-          $slider.find(".slides .slide").eq(index).css({
-            transform: "translateX("+left+"px)",
-            transition: transition
-          });
-        }else{
-          $slider.find(".slides .slide").eq(index).css({
-            left: left,
-            transition: transition
-          });
-        }
-      }
-      if(s.config.style === 'cubic'){
-        if(s.activeIndex === index){
-          $slider.find(".slides .slide").eq(index).css({
-            transform: "translateX("+left+"px) scale(1.7,1.7)",
-            transition: transition
-          });
-        }else{
-          $slider.find(".slides .slide").eq(index).css({
-            transform: "translateX("+left+"px) scale(1,1)",
-            transition: transition
-          });
-        }
-      }
-    },
-    slideTo:function(index){
-      var s = this;
-      var $slider = s.slider;
-      var $slides = $slider.find(".slides .slide")
-
-      if(index > s.length-1){
-        index = 0;
-      }else if(index < 0){
-        index = s.length-1;
-      }
-
-      s.activeIndex = index;
-      $slides.removeClass("active").eq(index).addClass("active");
-      $slides.removeClass(s.classNames.prevSlide).eq(index-1).addClass(s.classNames.prevSlide);
-      $slides.removeClass(s.classNames.nextSlide).eq(index+1).addClass(s.classNames.nextSlide);
-
-      if(s.config.hasDotNav){
-        $slider.find(".dot-nav li").removeClass("active").eq(index).addClass("active");
-      }
-      s._setSlidesPosition(index);
-
-    },
-    slideToNext:function(){
-      var s = this;
-      s.slideTo(s.activeIndex+1);
-    },
-    slideToPrev:function(){
-      var s = this;
-      s.slideTo(s.activeIndex-1);
-    },
-    _setSlidesPosition:function(activeIndex){
-      var s = this
-      var k
-      var left
-      if(s.config.infinite){
-        for(var i = 0;i < s.length;i++){
-          left = (i-1)*s.width
-          k = activeIndex + i - 1;
-          if(k>s.length-1){
-            k = k - s.length
-          }
-          s.setSlidePosition(k, left, true);
-        }
-      }else{
-        for(var i = 0;i < s.length;i++){
-          left = (i-activeIndex)*s.width
-          s.setSlidePosition(i, left, true);
-        }
-      }
     }
-  };
-  Slider.prototype.init.prototype = Slider.prototype;
-
-  jQuery.fn.slider = function(config){
-    return new Slider(this, config);
   }
 
-  return Slider;
-});
+  return Slider
+})()
+
+/*
+ * when using es2015 style of exporting, webpack put the output under default property, which is not what I want
+ * so as long as webpack keeping doing so, old-fashioned way of exporting is used
+ */
+
+// export default Slider
+module.exports = Slider

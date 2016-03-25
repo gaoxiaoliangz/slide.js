@@ -1,0 +1,84 @@
+.slider-container {
+  position: relative;
+  height: 100%; }
+.slider-container .slider-wrap {
+  position: relative;
+  overflow: hidden; }
+.slider-container .slider-wrap .slider-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 50; }
+.slider-container .slider-wrap .slider-slide img {
+  max-width: 100%;
+  display: inline-block; }
+.slider-container .slider-wrap .slider-slide.active {
+  z-index: 60; }
+.slider-container .slider-dot-nav {
+  width: 100%;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  padding: 20px 0; }
+.slider-container .slider-dot-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: center; }
+.slider-container .slider-dot-nav ul li {
+  display: inline-block;
+  margin: 0 10px;
+  position: relative;
+  width: 8px;
+  height: 8px; }
+.slider-container .slider-dot-nav ul li a {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: #999;
+  width: 8px;
+  height: 8px;
+  border-radius: 10px;
+  display: inline-block;
+  cursor: pointer; }
+.slider-container .slider-dot-nav ul li a:hover {
+  background: #666; }
+.slider-container .slider-dot-nav ul li.active a {
+  background: transparent;
+  border: 1px solid #08c;
+  top: -1px;
+  left: -1px; }
+.slider-container .slider-arrow-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0; }
+.slider-container .slider-arrow-nav ul li a {
+  width: 30px;
+  height: 70px;
+  display: inline-block;
+  position: absolute;
+  cursor: pointer;
+  background-size: 20px !important;
+  margin-top: -35px;
+  top: 50%;
+  padding: 0 15px;
+  opacity: .6;
+  transition: all 500ms;
+  z-index: 110; }
+.slider-container .slider-arrow-nav ul li a:hover {
+  opacity: 1; }
+.slider-container .slider-arrow-nav ul li.slider-nav-prev a {
+  left: 0;
+  background: url(../img/slider-nav-arrow-left.png) no-repeat center; }
+.slider-container .slider-arrow-nav ul li.slider-nav-next a {
+  right: 0;
+  background: url(../img/slider-nav-arrow-right.png) no-repeat center; }
+
+.slider-style-cubic {
+  overflow: hidden; }
+.slider-style-cubic .slider-wrap {
+  transform: scale(0.333, 0.333);
+  overflow: visible; }
+
+/*# sourceMappingURL=slider.css.map */

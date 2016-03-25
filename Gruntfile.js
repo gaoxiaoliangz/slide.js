@@ -1,8 +1,18 @@
 module.exports = function(grunt) {
 
   require("load-grunt-tasks")(grunt);
+  var webpack = require("webpack");
+  var webpackConfig = require("./webpack.config.js");
+
+  grunt.loadNpmTasks('grunt-webpack');
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
+    banner: '/*!\n' +
+        ' * Slider v<%= pkg.version %> (<%= pkg.homepage %>)\n' +
+        ' * Copyright 2015-<%= grunt.template.today("yyyy") %> <%= pkg.author %>\n' +
+        ' * Licensed under MIT\n' +
+        ' */\n',
     babel: {
       es2015: {
         options: {
@@ -13,84 +23,94 @@ module.exports = function(grunt) {
         }
       }
     },
+    webpack: {
+      build: {
+        entry: {
+          slider: ['./src/js/slider']
+        },
+        output: {
+          path: 'dist/js',
+          filename: '[name].umd.js',
+          libraryTarget: 'umd',
+          library: 'Slider'
+        },
+        module: webpackConfig.module,
+        resolve: webpackConfig.resolve,
+        plugins: [
+          new webpack.DefinePlugin({
+            'process.env.NODE_ENV': '"production"'
+          })
+        ]
+      }
+    },
     uglify: {
       options: {
-        sourceMap: true,
-        mangle: false
+        sourceMap: false,
+        mangle: true,
+        banner: '<%= banner %>'
       },
       target: {
         files: {
-          'dist/js/slider.min.js': ['src/js/slider.js']
+          'dist/js/slider.min.js': ['dist/js/slider.umd.js']
         }
+      }
+    },
+    copy: {
+      tar: {
+        expand: true,
+        cwd: 'dist',
+        src: 'js/*',
+        dest: 'example/assets',
       }
     },
     sass: {
       dist: {
         options: {
-          style: 'compressed'
+          style: 'compressed',
+          sourcemap: 'none'
         },
         files: {
           "dist/css/slider.min.css": "src/scss/slider.scss",
         }
       },
-      example: {
+      dev: {
         options: {
-          style: 'expened',
-          sourcemap: 'none'
+          style: 'expened'
         },
         files: {
-          "example/style.css": "src/scss/style.scss"
-        }
-      }
-    },
-    jade: {
-      compile: {
-        options: {
-          data: {
-            debug: true
-          }
-        },
-        files: {
-          "example/index.html": "src/jade/index.jade"
+          "example/assets/css/style.css": "src/scss/style.scss",
+          "example/assets/css/slider.css": "src/scss/slider.scss"
         }
       }
     },
     image: {
-      dynamic: {
+      dist: {
         files: [{
           expand: true,
-          cwd: 'src/',
+          cwd: 'src/img',
           src: ['**/*.{png,jpg,gif,svg}'],
-          dest: 'dist/'
+          dest: 'dist/img'
+        }]
+      },
+      dev: {
+        files: [{
+          expand: true,
+          cwd: 'src/img',
+          src: ['**/*.{png,jpg,gif,svg}'],
+          dest: 'example/assets/img'
         }]
       }
     },
     watch: {
-      css: {
-        files: ['*/*.scss','src/scss/*.scss'],
+      styles: {
+        files: ['src/scss/*.scss'],
         tasks: ['sass'],
         options: {
-            spawn: false
+          spawn: false
         },
-      },
-      scripts: {
-        files: ['src/js/*.js'],
-        tasks: ['babel',"uglify"],
-        options: {
-          spawn: false,
-        }
-      },
-      html: {
-        files: ['src/jade/*.jade'],
-        tasks: ['jade'],
-        options: {
-          spawn: false,
-        }
       }
     }
   });
 
-  grunt.registerTask("default", ["babel","sass","uglify","jade"]);
-  grunt.registerTask('w',['watch']);
-
+  grunt.registerTask("build", ["image","sass","webpack","uglify","copy"]);
 };
