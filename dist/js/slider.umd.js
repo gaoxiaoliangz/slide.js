@@ -1,4 +1,14 @@
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["Slider"] = factory();
+	else
+		root["Slider"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -53,10 +63,6 @@
 
 	"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _util = __webpack_require__(2);
@@ -73,6 +79,14 @@
 
 	var Slider = function () {
 
+	  var VERSION = "0.2.0";
+
+	  var supportedStyles = {
+	    default: "style-flat",
+	    flat: "style-flat",
+	    cubic: "style-cubic"
+	  };
+
 	  var defaultConfig = {
 	    hasDotNav: true,
 	    hasArrowNav: true,
@@ -81,7 +95,7 @@
 	    aspectRatio: 8 / 5,
 	    animationTime: 500,
 	    swipeThresholdWidth: 0.2,
-	    style: 'style-flat', // style-flat | style-cubic
+	    style: supportedStyles.default,
 	    infinite: false
 	  };
 
@@ -102,11 +116,19 @@
 	  var ZINDEX = 50;
 
 	  var Slider = function () {
+	    _createClass(Slider, null, [{
+	      key: "version",
+	      get: function get() {
+	        return VERSION;
+	      }
+	    }]);
+
 	    function Slider(selector, config) {
 	      _classCallCheck(this, Slider);
 
 	      this.selector = selector;
 	      this.config = Object.assign({}, defaultConfig, config);
+	      this.validateConfig(this.config);
 
 	      this.sliderDom = document.querySelector(selector);
 	      this.slides = document.querySelectorAll(selector + ">div");
@@ -203,6 +225,24 @@
 	        }
 	      }
 	    }, {
+	      key: "validateConfig",
+	      value: function validateConfig(config) {
+	        var isStyleValid = false;
+
+	        // style
+	        for (var prop in supportedStyles) {
+	          if (supportedStyles[prop] === config.style) {
+	            isStyleValid = true;
+	            break;
+	          }
+	        }
+	        if (!isStyleValid) {
+	          config.style = supportedStyles.default;
+	        }
+
+	        // todo: all the rest props
+	      }
+	    }, {
 	      key: "buildDom",
 	      value: function buildDom() {
 	        var wrap = document.createElement("div");
@@ -272,12 +312,14 @@
 	            left = offset * this.width;
 	          } else {
 	            left = offset * this.width;
-	            this.setSlidePosition(index, left, offset, true);
 	          }
 
 	          this.setSlidePosition(index, left, offset, true);
 	        }.bind(this));
 	      }
+
+	      // todo: z-index bug
+
 	    }, {
 	      key: "setSlidePosition",
 	      value: function setSlidePosition(index, left, offset, isAnimated) {
@@ -357,7 +399,13 @@
 	  return Slider;
 	}();
 
-	exports.default = Slider;
+	/*
+	 * when using es2015 style of exporting, webpack put the output under default property, which is not what I want
+	 * so as long as webpack keeping doing so, old-fashioned way of exporting is used
+	 */
+
+	// export default Slider
+	module.exports = Slider;
 
 /***/ },
 /* 2 */
@@ -527,4 +575,6 @@
 	exports.default = Dom;
 
 /***/ }
-/******/ ]);
+/******/ ])
+});
+;

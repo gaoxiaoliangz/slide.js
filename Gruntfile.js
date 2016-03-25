@@ -7,6 +7,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-webpack');
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
+    banner: '/*!\n' +
+        ' * Slider v<%= pkg.version %> (<%= pkg.homepage %>)\n' +
+        ' * Copyright 2015-<%= grunt.template.today("yyyy") %> <%= pkg.author %>\n' +
+        ' * Licensed under MIT\n' +
+        ' */\n',
     babel: {
       es2015: {
         options: {
@@ -23,8 +29,10 @@ module.exports = function(grunt) {
           slider: ['./src/js/slider']
         },
         output: {
-          path: 'example/assets/js',
-          filename: '[name].js'
+          path: 'dist/js',
+          filename: '[name].umd.js',
+          libraryTarget: 'umd',
+          library: 'Slider'
         },
         module: webpackConfig.module,
         resolve: webpackConfig.resolve,
@@ -38,12 +46,21 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         sourceMap: false,
-        mangle: true
+        mangle: true,
+        banner: '<%= banner %>'
       },
       target: {
         files: {
-          'dist/js/slider.min.js': ['example/assets/js/slider.js']
+          'dist/js/slider.min.js': ['dist/js/slider.umd.js']
         }
+      }
+    },
+    copy: {
+      tar: {
+        expand: true,
+        cwd: 'dist',
+        src: 'js/*',
+        dest: 'example/assets',
       }
     },
     sass: {
@@ -95,5 +112,5 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask("build", ["image","sass","webpack","uglify"]);
+  grunt.registerTask("build", ["image","sass","webpack","uglify","copy"]);
 };

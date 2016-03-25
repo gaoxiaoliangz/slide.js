@@ -4,12 +4,12 @@ var hot = 'webpack-hot-middleware/client'
 
 module.exports = {
   entry: {
-    index: ['./src/js/index']
+    test: ['./src/js/test']
   },
   output: {
     path: path.join(__dirname, 'example/assets/js'),
     filename: '[name].js',
-    publicPath: '/assets/js/'
+    publicPath: '/__webpack__/'
   },
   plugins: [
     new webpack.optimize.OccurenceOrderPlugin(),

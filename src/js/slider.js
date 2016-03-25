@@ -3,6 +3,14 @@ import _D from "./dom"
 
 const Slider = (() => {
 
+  const VERSION = "0.2.0"
+
+  const supportedStyles = {
+    default: "style-flat",
+    flat: "style-flat",
+    cubic: "style-cubic"
+  }
+
   const defaultConfig = {
     hasDotNav: true,
     hasArrowNav: true,
@@ -11,7 +19,7 @@ const Slider = (() => {
     aspectRatio: 8/5,
     animationTime: 500,
     swipeThresholdWidth: 0.2,
-    style: 'style-flat', // style-flat | style-cubic
+    style: supportedStyles.default,
     infinite: false
   }
 
@@ -32,9 +40,15 @@ const Slider = (() => {
   const ZINDEX = 50
 
   class Slider {
+
+    static get version() {
+      return VERSION
+    }
+
     constructor(selector, config) {
       this.selector = selector
       this.config = Object.assign({}, defaultConfig, config)
+      this.validateConfig(this.config)
 
       this.sliderDom = document.querySelector(selector)
       this.slides = document.querySelectorAll(`${selector}>div`)
@@ -126,6 +140,23 @@ const Slider = (() => {
       }
     }
 
+    validateConfig(config) {
+      let isStyleValid = false
+
+      // style
+      for(var prop in supportedStyles) {
+        if(supportedStyles[prop] === config.style) {
+          isStyleValid = true
+          break
+        }
+      }
+      if(!isStyleValid) {
+        config.style = supportedStyles.default
+      }
+
+      // todo: all the rest props
+    }
+
     buildDom() {
       var wrap = document.createElement("div")
       var dotNav = document.createElement("nav")
@@ -192,13 +223,13 @@ const Slider = (() => {
           left = offset * this.width
         }else{
           left = offset * this.width
-          this.setSlidePosition(index, left, offset, true);
         }
 
         this.setSlidePosition(index, left, offset, true);
       }.bind(this))
     }
 
+    // todo: z-index bug
     setSlidePosition(index, left, offset, isAnimated) {
       var transition = isAnimated?"all "+this.config.animationTime+"ms":"all 0ms"
 
@@ -268,4 +299,10 @@ const Slider = (() => {
   return Slider
 })()
 
-export default Slider
+/*
+ * when using es2015 style of exporting, webpack put the output under default property, which is not what I want
+ * so as long as webpack keeping doing so, old-fashioned way of exporting is used
+ */
+
+// export default Slider
+module.exports = Slider
