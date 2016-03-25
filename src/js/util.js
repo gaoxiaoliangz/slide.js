@@ -14,6 +14,14 @@ const Util = (() => {
 
     unlockScroll(){
       document.body.style.overflow = "auto"
+    },
+
+    immutable(obj){
+      let newObj = {}
+      for(let prop in obj){
+        newObj[prop] = obj[prop]
+      }
+      return newObj
     }
   }
 

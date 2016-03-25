@@ -7,11 +7,11 @@ const Slider = (() => {
     hasDotNav: true,
     hasArrowNav: true,
     autoplay: true,
-    autoplayInterval: 4000,
+    autoplayInterval: 3000,
     aspectRatio: 8/5,
     animationTime: 500,
     swipeThresholdWidth: 0.2,
-    style: 'style-flat', // flat | cubic
+    style: 'style-flat', // style-flat | style-cubic
     infinite: false
   }
 
@@ -29,10 +29,12 @@ const Slider = (() => {
     next: 'slider-nav-next',
   }
 
+  const ZINDEX = 50
+
   class Slider {
     constructor(selector, config) {
-      this.config = defaultConfig
       this.selector = selector
+      this.config = Object.assign({}, defaultConfig, config)
 
       this.sliderDom = document.querySelector(selector)
       this.slides = document.querySelectorAll(`${selector}>div`)
@@ -44,46 +46,84 @@ const Slider = (() => {
       this.translateX = (!Util.isIE(8)?true:false);
       this.touchstartX = 0;
 
-
-      // todo: use es6 object extend
-      // for(option in config){
-      //   if(option === 'style'){
-      //     console.log(typeof config[option])
-      //     if(['flat','cubic'].indexOf(config[option]) === -1){
-      //       console.error('Style undefined, default style will be applied')
-      //       continue
-      //     }
-      //   }
-      //   defaultConfig[option] = config[option];
-      // }
-
-      this.config = Object.assign(defaultConfig, config)
-
       this.buildDom()
+      this.setSliderSize()
       this.addListeners()
-
+      this.setSlidesPosition(this.activeIndex)
+      this.autoplay()
     }
 
     addListeners(){
-      var _this = this
-
-      Array.prototype.forEach.call(this.arrowNavLi, (ele, index) => {
-        ele.addEventListener("click", function(){
+      // arrow nav btn
+      Array.prototype.forEach.call(this.arrowNavBtn, function(ele, index) {
+        ele.addEventListener("click", function(e){
+          clearInterval(this.autoplaySlides)
           if(index === 0){
-            _this.slideToPrev()
+            this.slideToPrev()
           } else if(index === 1){
-            _this.slideToNext()
+            this.slideToNext()
           }
-          return false
-        })
-      })
+          e.preventDefault()
+        }.bind(this))
+      }.bind(this))
 
-      Array.prototype.forEach.call(this.dotNavLi, (ele, index) => {
-        ele.addEventListener("click", function(){
-          _this.slideTo(index)
-          return false
-        })
-      })
+      // dot nav btn
+      Array.prototype.forEach.call(this.dotNavBtn, function(ele, index) {
+        ele.addEventListener("click", function(e){
+          clearInterval(this.autoplaySlides)
+          this.slideTo(index)
+          e.preventDefault()
+        }.bind(this))
+      }.bind(this))
+
+      // touch support
+      this.sliderWrap.addEventListener("touchstart", function(e){
+        clearInterval(this.autoplaySlides)
+        this.handleTouch(e)
+      }.bind(this))
+      this.sliderWrap.addEventListener("touchmove", function(e){
+        this.handleTouch(e)
+      }.bind(this))
+      this.sliderWrap.addEventListener("touchend", function(e){
+        this.handleTouch(e)
+      }.bind(this))
+    }
+
+    // todo
+    handleTouch(e) {
+      var touches = e.changedTouches,
+          x = touches[0].pageX,
+          y = touches[0].pageY,
+          s = this
+
+      if(e.type === "touchstart"){
+        s.touchstartX = x;
+      }
+      if(e.type === "touchend"){
+        var dist = x - s.touchstartX;
+        if(dist > s.width*s.config.swipeThresholdWidth){
+          if(s.activeIndex === 0){
+            s.slideTo(s.activeIndex);
+          }else{
+            s.slideToPrev();
+          }
+        }else if(dist < -s.width*s.config.swipeThresholdWidth){
+          if(s.activeIndex === s.length-1){
+            s.slideTo(s.activeIndex);
+          }else{
+            s.slideToNext();
+          }
+        }else{
+          s.slideTo(s.activeIndex);
+        }
+        s.touchstartX = 0;
+      }
+      if(e.type === "touchmove"){
+        for(var i = 0;i < s.length;i++){
+          let left = (i-s.activeIndex)*s.width+(x-s.touchstartX);
+          s.setSlidePosition(i, left, false);
+        }
+      }
     }
 
     buildDom() {
@@ -95,21 +135,14 @@ const Slider = (() => {
       this.arrowNav = arrowNav
       this.sliderWrap = wrap
 
-
       // prepare slides
       wrap.className = classNames.wrap
       Array.prototype.forEach.call(this.slides, (slide, index)=> {
-        if(this.activeIndex === index){
-          slide.className += ` ${classNames.active}`
-        }
         slide.className += ` ${classNames.slide}`
         wrap.appendChild(slide)
       })
       this.sliderDom.className += ` ${classNames.container} ${classNames.name}-${this.config.style}`
       this.sliderDom.appendChild(wrap)
-
-      this.setSliderStyle()
-
 
       // dot nav
       if(this.config.hasDotNav){
@@ -124,6 +157,7 @@ const Slider = (() => {
         }
       }
       this.dotNavLi = this.dotNav.querySelectorAll("li")
+      this.dotNavBtn = this.dotNav.querySelectorAll("a")
 
       // arrow nav
       if(this.config.hasArrowNav){
@@ -131,49 +165,48 @@ const Slider = (() => {
         arrowNav.className = classNames.arrowNav
         this.sliderDom.appendChild(arrowNav)
       }
-      this.arrowNavLi = this.arrowNav.querySelectorAll("li")
+      this.arrowNavBtn = this.arrowNav.querySelectorAll("a")
     }
 
-    setSliderStyle() {
+    setSliderSize() {
       this.width = this.sliderDom.getBoundingClientRect().width
       this.height = this.width/this.config.aspectRatio
-      this.sliderWrap.style.width = this.width+"px"
-      this.sliderWrap.style.height = this.height+"px"
-      this.setSlidesPosition(this.activeIndex)
 
-      // $slides.removeClass(s.classNames.prevSlide).eq(s.activeIndex-1).addClass(s.classNames.prevSlide)
-      // $slides.removeClass(s.classNames.nextSlide).eq(s.activeIndex+1).addClass(s.classNames.nextSlide)
+      _D(this.sliderWrap).width(this.width).height(this.height)
+      _D(this.slides).width(this.width).height(this.height)
     }
 
-
-    // todo: opt
     setSlidesPosition(activeIndex) {
-      var s = this
-      var k
-      var left
-      if(s.config.infinite){
-        for(var i = 0;i < s.length;i++){
-          left = (i-1)*s.width
-          k = activeIndex + i - 1;
-          if(k>s.length-1){
-            k = k - s.length
+      this.setActive(activeIndex)
+
+      Array.prototype.forEach.call(this.slides, function(ele,index){
+        let offset = index - activeIndex
+        var left
+
+        if(this.config.infinite){
+          if(offset < -1){
+            offset = offset + this.length
+          }else if(offset > this.length-2){
+            offset = offset - this.length
           }
-          s.setSlidePosition(k, left, true);
+          left = offset * this.width
+        }else{
+          left = offset * this.width
+          this.setSlidePosition(index, left, offset, true);
         }
-      }else{
-        for(var i = 0;i < s.length;i++){
-          left = (i-activeIndex)*s.width
-          s.setSlidePosition(i, left, true);
-        }
-      }
+
+        this.setSlidePosition(index, left, offset, true);
+      }.bind(this))
     }
 
-    setSlidePosition(index, left, isAnimated) {
+    setSlidePosition(index, left, offset, isAnimated) {
       var transition = isAnimated?"all "+this.config.animationTime+"ms":"all 0ms"
 
       this.slides[index].style.transition = transition
 
       if(this.config.style === 'style-flat'){
+        let zIndex = ZINDEX - offset
+        this.slides[index].style.zIndex = zIndex
         if(this.translateX) {
           this.slides[index].style.transform = "translateX("+left+"px)"
         }else{
@@ -182,7 +215,9 @@ const Slider = (() => {
       }
 
       if(this.config.style === 'style-cubic') {
-        if(this.activeIndex === index){
+        let zIndex = ZINDEX - Math.abs(offset)
+        this.slides[index].style.zIndex = zIndex
+        if(offset === 0){
           this.slides[index].style.transform = "translateX("+left+"px) scale(1.7,1.7)"
         }else{
           this.slides[index].style.transform = "translateX("+left+"px) scale(1,1)"
@@ -190,38 +225,43 @@ const Slider = (() => {
       }
     }
 
+    setActive(index) {
+      this.activeIndex = index
+      _D(this.slides).removeClass(classNames.active).eq(index).addClass(classNames.active)
+      if(this.config.hasDotNav) {
+        _D(this.dotNavLi).removeClass(classNames.active).eq(index).addClass(classNames.active)
+      }
+    }
 
     slideTo(index) {
-      var s = this;
-
-      if(index > s.length-1){
+      if(index > this.length-1){
         index = 0;
       }else if(index < 0){
-        index = s.length-1;
+        index = this.length-1;
       }
-
-      s.activeIndex = index;
-
-
-      // $slides.removeClass("active").eq(index).addClass("active");
-      // $slides.removeClass(s.classNames.prevSlide).eq(index-1).addClass(s.classNames.prevSlide);
-      // $slides.removeClass(s.classNames.nextSlide).eq(index+1).addClass(s.classNames.nextSlide);
-
-
-      if(s.config.hasDotNav){
-        _D(s.dotNavLi).removeClass("active")
-        _D(s.dotNavLi[index]).addClass("active")
-      }
-      s.setSlidesPosition(index);
-
+      this.setSlidesPosition(index)
     }
 
     slideToNext() {
-      this.slideTo(this.activeIndex+1);
+      this.slideTo(this.activeIndex+1)
     }
 
-    slideToPrev(){
-      this.slideTo(this.activeIndex-1);
+    slideToPrev() {
+      this.slideTo(this.activeIndex-1)
+    }
+
+    autoplay() {
+      var s = this;
+      if(s.config.autoplay){
+        s.autoplaySlides = setInterval(function(){
+          s.slideTo(s.autoplayIndex);
+          if(s.autoplayIndex === s.length-1){
+            s.autoplayIndex = 0;
+          }else{
+            s.autoplayIndex++;
+          }
+        },s.config.autoplayInterval);
+      }
     }
   }
 

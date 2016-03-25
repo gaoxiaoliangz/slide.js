@@ -77,11 +77,11 @@
 	    hasDotNav: true,
 	    hasArrowNav: true,
 	    autoplay: true,
-	    autoplayInterval: 4000,
+	    autoplayInterval: 3000,
 	    aspectRatio: 8 / 5,
 	    animationTime: 500,
 	    swipeThresholdWidth: 0.2,
-	    style: 'style-flat', // flat | cubic
+	    style: 'style-flat', // style-flat | style-cubic
 	    infinite: false
 	  };
 
@@ -99,12 +99,14 @@
 	    next: 'slider-nav-next'
 	  };
 
+	  var ZINDEX = 50;
+
 	  var Slider = function () {
 	    function Slider(selector, config) {
 	      _classCallCheck(this, Slider);
 
-	      this.config = defaultConfig;
 	      this.selector = selector;
+	      this.config = Object.assign({}, defaultConfig, config);
 
 	      this.sliderDom = document.querySelector(selector);
 	      this.slides = document.querySelectorAll(selector + ">div");
@@ -116,29 +118,93 @@
 	      this.translateX = !_util2.default.isIE(8) ? true : false;
 	      this.touchstartX = 0;
 
-	      // todo: use es6 object extend
-	      // for(option in config){
-	      //   if(option === 'style'){
-	      //     console.log(typeof config[option])
-	      //     if(['flat','cubic'].indexOf(config[option]) === -1){
-	      //       console.error('Style undefined, default style will be applied')
-	      //       continue
-	      //     }
-	      //   }
-	      //   defaultConfig[option] = config[option];
-	      // }
 	      this.buildDom();
-
-	      this.arrowNav.addEventListener("click", function () {
-	        console.log(12121212);
-	      });
+	      this.setSliderSize();
+	      this.addListeners();
+	      this.setSlidesPosition(this.activeIndex);
+	      this.autoplay();
 	    }
 
 	    _createClass(Slider, [{
+	      key: "addListeners",
+	      value: function addListeners() {
+	        // arrow nav btn
+	        Array.prototype.forEach.call(this.arrowNavBtn, function (ele, index) {
+	          ele.addEventListener("click", function (e) {
+	            clearInterval(this.autoplaySlides);
+	            if (index === 0) {
+	              this.slideToPrev();
+	            } else if (index === 1) {
+	              this.slideToNext();
+	            }
+	            e.preventDefault();
+	          }.bind(this));
+	        }.bind(this));
+
+	        // dot nav btn
+	        Array.prototype.forEach.call(this.dotNavBtn, function (ele, index) {
+	          ele.addEventListener("click", function (e) {
+	            clearInterval(this.autoplaySlides);
+	            this.slideTo(index);
+	            e.preventDefault();
+	          }.bind(this));
+	        }.bind(this));
+
+	        // touch support
+	        this.sliderWrap.addEventListener("touchstart", function (e) {
+	          clearInterval(this.autoplaySlides);
+	          this.handleTouch(e);
+	        }.bind(this));
+	        this.sliderWrap.addEventListener("touchmove", function (e) {
+	          this.handleTouch(e);
+	        }.bind(this));
+	        this.sliderWrap.addEventListener("touchend", function (e) {
+	          this.handleTouch(e);
+	        }.bind(this));
+	      }
+
+	      // todo
+
+	    }, {
+	      key: "handleTouch",
+	      value: function handleTouch(e) {
+	        var touches = e.changedTouches,
+	            x = touches[0].pageX,
+	            y = touches[0].pageY,
+	            s = this;
+
+	        if (e.type === "touchstart") {
+	          s.touchstartX = x;
+	        }
+	        if (e.type === "touchend") {
+	          var dist = x - s.touchstartX;
+	          if (dist > s.width * s.config.swipeThresholdWidth) {
+	            if (s.activeIndex === 0) {
+	              s.slideTo(s.activeIndex);
+	            } else {
+	              s.slideToPrev();
+	            }
+	          } else if (dist < -s.width * s.config.swipeThresholdWidth) {
+	            if (s.activeIndex === s.length - 1) {
+	              s.slideTo(s.activeIndex);
+	            } else {
+	              s.slideToNext();
+	            }
+	          } else {
+	            s.slideTo(s.activeIndex);
+	          }
+	          s.touchstartX = 0;
+	        }
+	        if (e.type === "touchmove") {
+	          for (var i = 0; i < s.length; i++) {
+	            var left = (i - s.activeIndex) * s.width + (x - s.touchstartX);
+	            s.setSlidePosition(i, left, false);
+	          }
+	        }
+	      }
+	    }, {
 	      key: "buildDom",
 	      value: function buildDom() {
-	        var _this = this;
-
 	        var wrap = document.createElement("div");
 	        var dotNav = document.createElement("nav");
 	        var arrowNav = document.createElement("nav");
@@ -150,16 +216,11 @@
 	        // prepare slides
 	        wrap.className = classNames.wrap;
 	        Array.prototype.forEach.call(this.slides, function (slide, index) {
-	          if (_this.activeIndex === index) {
-	            slide.className += " " + classNames.active;
-	          }
 	          slide.className += " " + classNames.slide;
 	          wrap.appendChild(slide);
 	        });
 	        this.sliderDom.className += " " + classNames.container + " " + classNames.name + "-" + this.config.style;
 	        this.sliderDom.appendChild(wrap);
-
-	        this.setSliderStyle();
 
 	        // dot nav
 	        if (this.config.hasDotNav) {
@@ -173,6 +234,8 @@
 	            dotNav.querySelector("ul").appendChild(dotNavLi);
 	          }
 	        }
+	        this.dotNavLi = this.dotNav.querySelectorAll("li");
+	        this.dotNavBtn = this.dotNav.querySelectorAll("a");
 
 	        // arrow nav
 	        if (this.config.hasArrowNav) {
@@ -180,98 +243,51 @@
 	          arrowNav.className = classNames.arrowNav;
 	          this.sliderDom.appendChild(arrowNav);
 	        }
+	        this.arrowNavBtn = this.arrowNav.querySelectorAll("a");
 	      }
 	    }, {
-	      key: "setSliderStyle",
-	      value: function setSliderStyle() {
+	      key: "setSliderSize",
+	      value: function setSliderSize() {
 	        this.width = this.sliderDom.getBoundingClientRect().width;
 	        this.height = this.width / this.config.aspectRatio;
-	        this.sliderWrap.style.width = this.width + "px";
-	        this.sliderWrap.style.height = this.height + "px";
-	        this.setSlidesPosition(this.activeIndex);
 
-	        // console.log(_D);
-
-	        // var test = new _D(`.${classNames.wrap}>div`)
-	        // console.log(`${classNames.wrap}>div`)
-	        // var test = new _D("abc")
-	        // console.log(test.removeClass("slider-slide"))
-
-	        // console.log(_D(`.${classNames.wrap}>div`).removeClass("slider-slide"));
-
-	        // console.log(_D(document.body).addClass("fuck"));
-	        // console.log(_D("body"));
-
-	        // this.slides.removeClass("123")
-
-	        // (new _D(`${classNames.wrap}>div`)).removeClass("slider-slide")
-
-	        // class A {
-	        //   constructor(a){
-	        //     this.a = a
-	        //     // return a
-	        //     this.test()
-	        //   }
-	        //   test(){
-	        //     console.log(this.a)
-	        //     return "fuck"
-	        //   }
-	        // }
-	        //
-	        // function newA(a){
-	        //   return (new A(a)).test()
-	        // }
-	        //
-	        //
-	        // console.log(newA("jfiej"));
-	        // var a = new A("body")
-	        // console.log(a);
-	        // a.test()
-	        // console.log(a.test());
-
-	        // _D(this.slides).removeClass(classNames.nextSlide)[this.activeIndex+1].addClass(classNames.nextSlide)
-	        // className += ` ${classNames.nextSlide}`
-
-	        console.log((0, _dom2.default)(this.slides));
-
-	        // Util.removeClass(this.slides, classNames.prevSlide)[this.activeIndex-1].className += ` ${classNames.prevSlide}`
-	        // Util.removeClass(this.slides, classNames.nextSlide)[this.activeIndex+1].className += ` ${classNames.nextSlide}`
-	        // $slides.removeClass(s.classNames.prevSlide).eq(s.activeIndex-1).addClass(s.classNames.prevSlide)
-	        // $slides.removeClass(s.classNames.nextSlide).eq(s.activeIndex+1).addClass(s.classNames.nextSlide)
+	        (0, _dom2.default)(this.sliderWrap).width(this.width).height(this.height);
+	        (0, _dom2.default)(this.slides).width(this.width).height(this.height);
 	      }
-
-	      // todo: opt
-
 	    }, {
 	      key: "setSlidesPosition",
 	      value: function setSlidesPosition(activeIndex) {
-	        var s = this;
-	        var k;
-	        var left;
-	        if (s.config.infinite) {
-	          for (var i = 0; i < s.length; i++) {
-	            left = (i - 1) * s.width;
-	            k = activeIndex + i - 1;
-	            if (k > s.length - 1) {
-	              k = k - s.length;
+	        this.setActive(activeIndex);
+
+	        Array.prototype.forEach.call(this.slides, function (ele, index) {
+	          var offset = index - activeIndex;
+	          var left;
+
+	          if (this.config.infinite) {
+	            if (offset < -1) {
+	              offset = offset + this.length;
+	            } else if (offset > this.length - 2) {
+	              offset = offset - this.length;
 	            }
-	            s.setSlidePosition(k, left, true);
+	            left = offset * this.width;
+	          } else {
+	            left = offset * this.width;
+	            this.setSlidePosition(index, left, offset, true);
 	          }
-	        } else {
-	          for (var i = 0; i < s.length; i++) {
-	            left = (i - activeIndex) * s.width;
-	            s.setSlidePosition(i, left, true);
-	          }
-	        }
+
+	          this.setSlidePosition(index, left, offset, true);
+	        }.bind(this));
 	      }
 	    }, {
 	      key: "setSlidePosition",
-	      value: function setSlidePosition(index, left, isAnimated) {
+	      value: function setSlidePosition(index, left, offset, isAnimated) {
 	        var transition = isAnimated ? "all " + this.config.animationTime + "ms" : "all 0ms";
 
 	        this.slides[index].style.transition = transition;
 
 	        if (this.config.style === 'style-flat') {
+	          var zIndex = ZINDEX - offset;
+	          this.slides[index].style.zIndex = zIndex;
 	          if (this.translateX) {
 	            this.slides[index].style.transform = "translateX(" + left + "px)";
 	          } else {
@@ -280,7 +296,9 @@
 	        }
 
 	        if (this.config.style === 'style-cubic') {
-	          if (this.activeIndex === index) {
+	          var _zIndex = ZINDEX - Math.abs(offset);
+	          this.slides[index].style.zIndex = _zIndex;
+	          if (offset === 0) {
 	            this.slides[index].style.transform = "translateX(" + left + "px) scale(1.7,1.7)";
 	          } else {
 	            this.slides[index].style.transform = "translateX(" + left + "px) scale(1,1)";
@@ -288,26 +306,48 @@
 	        }
 	      }
 	    }, {
+	      key: "setActive",
+	      value: function setActive(index) {
+	        this.activeIndex = index;
+	        (0, _dom2.default)(this.slides).removeClass(classNames.active).eq(index).addClass(classNames.active);
+	        if (this.config.hasDotNav) {
+	          (0, _dom2.default)(this.dotNavLi).removeClass(classNames.active).eq(index).addClass(classNames.active);
+	        }
+	      }
+	    }, {
 	      key: "slideTo",
 	      value: function slideTo(index) {
-	        var s = this;
-
-	        if (index > s.length - 1) {
+	        if (index > this.length - 1) {
 	          index = 0;
 	        } else if (index < 0) {
-	          index = s.length - 1;
+	          index = this.length - 1;
 	        }
-
-	        s.activeIndex = index;
-
-	        // $slides.removeClass("active").eq(index).addClass("active");
-	        // $slides.removeClass(s.classNames.prevSlide).eq(index-1).addClass(s.classNames.prevSlide);
-	        // $slides.removeClass(s.classNames.nextSlide).eq(index+1).addClass(s.classNames.nextSlide);
-
-	        if (s.config.hasDotNav) {
-	          $slider.find(".dot-nav li").removeClass("active").eq(index).addClass("active");
+	        this.setSlidesPosition(index);
+	      }
+	    }, {
+	      key: "slideToNext",
+	      value: function slideToNext() {
+	        this.slideTo(this.activeIndex + 1);
+	      }
+	    }, {
+	      key: "slideToPrev",
+	      value: function slideToPrev() {
+	        this.slideTo(this.activeIndex - 1);
+	      }
+	    }, {
+	      key: "autoplay",
+	      value: function autoplay() {
+	        var s = this;
+	        if (s.config.autoplay) {
+	          s.autoplaySlides = setInterval(function () {
+	            s.slideTo(s.autoplayIndex);
+	            if (s.autoplayIndex === s.length - 1) {
+	              s.autoplayIndex = 0;
+	            } else {
+	              s.autoplayIndex++;
+	            }
+	          }, s.config.autoplayInterval);
 	        }
-	        s.setSlidesPosition(index);
 	      }
 	    }]);
 
@@ -342,22 +382,12 @@
 	    unlockScroll: function unlockScroll() {
 	      document.body.style.overflow = "auto";
 	    },
-	    removeClass: function removeClass(dom, classToRemove) {
-
-	      var _removeEleClass = function _removeEleClass(ele) {
-	        var classNames = ele.className.replace(classToRemove, "");
-	        ele.className = classNames;
-	      };
-
-	      if (dom.length >= 1) {
-	        Array.prototype.forEach.call(dom, function (e, i) {
-	          _removeEleClass(e);
-	        });
-	      } else {
-	        _removeEleClass(dom);
+	    immutable: function immutable(obj) {
+	      var newObj = {};
+	      for (var prop in obj) {
+	        newObj[prop] = obj[prop];
 	      }
-
-	      return dom;
+	      return newObj;
 	    }
 	  };
 
@@ -368,7 +398,7 @@
 
 /***/ },
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
 
@@ -378,42 +408,108 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _util = __webpack_require__(2);
-
-	var _util2 = _interopRequireDefault(_util);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var Dom = function () {
+
+	  // todo: make all return dom array
+
 	  var Dom = function () {
 	    function Dom(selector) {
 	      _classCallCheck(this, Dom);
 
 	      this.selector = selector;
 	      this.dom = selector;
-
-	      if (typeof this.selector === "string") {
-	        this.dom = document.querySelector(this.selector);
-	      }
+	      this.init();
 	    }
 
 	    _createClass(Dom, [{
 	      key: "init",
 	      value: function init() {
+	        if (typeof this.selector === "string") {
+	          this.dom = document.querySelectorAll(this.selector);
+	        }
+
 	        return this;
+	      }
+
+	      // todo: there seems to be a better way of doing this
+
+	    }, {
+	      key: "_handleDomArray",
+	      value: function _handleDomArray(handler, args) {
+	        if (typeof this.dom.length !== "undefined") {
+	          Array.prototype.forEach.call(this.dom, function (ele, i) {
+	            handler.bind(null, ele).apply(null, args);
+	          });
+	          if (this.dom.length == 1) {
+	            this.dom = this.dom[0];
+	          }
+	        } else {
+	          handler.bind(null, this.dom).apply(null, args);
+	        }
 	      }
 	    }, {
 	      key: "removeClass",
-	      value: function removeClass(classToRemove) {
-	        _util2.default.removeClass(this.dom, classToRemove);
+	      value: function removeClass(className) {
+	        var _removeEleClass = function _removeEleClass(ele, className) {
+	          ele.className = ele.className.replace(className, "");
+	        };
+
+	        this._handleDomArray(_removeEleClass, arguments);
+
 	        return this;
 	      }
 	    }, {
 	      key: "addClass",
 	      value: function addClass(className) {
-	        this.dom.className += " " + className;
+	        var _addEleClass = function _addEleClass(ele, className) {
+	          ele.className += " " + className;
+	        };
+
+	        this._handleDomArray(_addEleClass, arguments);
+
+	        return this;
+	      }
+	    }, {
+	      key: "eq",
+	      value: function eq(index) {
+	        // todo: add dom check
+	        if (index < 0) {
+	          index = index + this.dom.length;
+	        }
+	        this.dom = this.dom[index];
+
+	        return this;
+	      }
+	    }, {
+	      key: "find",
+	      value: function find(selector) {
+	        // todo: add dom check
+	        this.dom = this.dom.querySelectorAll(selector);
+
+	        return this;
+	      }
+	    }, {
+	      key: "width",
+	      value: function width(_width2) {
+	        var _width = function _width(ele, width) {
+	          // todo: add width check
+	          ele.style.width = width + "px";
+	        };
+	        this._handleDomArray(_width, arguments);
+
+	        return this;
+	      }
+	    }, {
+	      key: "height",
+	      value: function height(_height2) {
+	        var _height = function _height(ele, width) {
+	          // todo: add height check
+	          ele.style.height = _height2 + "px";
+	        };
+	        this._handleDomArray(_height, arguments);
+
 	        return this;
 	      }
 	    }]);
