@@ -106,3 +106,19 @@ $text_3: #999;
     overflow: visible;
   }
 }
+
+.page-flip-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  .slider-dot-nav {
+    left: 15px;
+    ul {
+      width: 30px;
+      li {
+        height: 20px;
+        display: block;
+      }
+    }
+  }
+}

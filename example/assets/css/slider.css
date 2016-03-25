@@ -81,4 +81,16 @@
   transform: scale(0.333, 0.333);
   overflow: visible; }
 
+.page-flip-container {
+  position: fixed;
+  left: 0;
+  top: 0; }
+.page-flip-container .slider-dot-nav {
+  left: 15px; }
+.page-flip-container .slider-dot-nav ul {
+  width: 30px; }
+.page-flip-container .slider-dot-nav ul li {
+  height: 20px;
+  display: block; }
+
 /*# sourceMappingURL=slider.css.map */

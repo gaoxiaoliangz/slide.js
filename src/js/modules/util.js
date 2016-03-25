@@ -2,13 +2,13 @@ const Util = (() => {
 
   let Util = {
 
-    isIE(ver){
+    isIE(ver) {
       var b = document.createElement('b')
       b.innerHTML = '<!--[if IE ' + ver + ']><i></i><![endif]-->'
       return b.getElementsByTagName('i').length === 1
     },
 
-    lockScroll(){
+    lockScroll() {
       document.body.style.overflow = "hidden"
     },
 
@@ -16,7 +16,7 @@ const Util = (() => {
       document.body.style.overflow = "auto"
     },
 
-    immutable(obj){
+    immutable(obj) {
       let newObj = {}
       for(let prop in obj){
         newObj[prop] = obj[prop]
@@ -28,4 +28,4 @@ const Util = (() => {
   return Util
 })()
 
-export default Util
+module.exports = Util

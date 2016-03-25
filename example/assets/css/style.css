@@ -23,6 +23,9 @@ body .container .content {
   font-size: 18px;
   line-height: 1.7; }
 
+body.test2 .container {
+  margin: 0; }
+
 @media (max-width: 600px) {
   body .container {
     width: 100%; } }

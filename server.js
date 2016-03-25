@@ -14,12 +14,20 @@ app.use(webpackHotMiddleware(compiler))
 
 app.use(express.static(path.join(__dirname, 'example')))
 
-app.get("/", function(req, res) {
-  res.sendFile(__dirname + '/example/index.html')
+app.get("/slider", function(req, res) {
+  res.sendFile(__dirname + '/example/slider.html')
+})
+
+app.get("/page-flip", function(req, res) {
+  res.sendFile(__dirname + '/example/page-flip.html')
 })
 
 app.get("/test", function(req, res) {
   res.sendFile(__dirname + '/example/test.html')
+})
+
+app.get("/test2", function(req, res) {
+  res.sendFile(__dirname + '/example/test2.html')
 })
 
 app.listen(port, function(error) {

@@ -21,12 +21,22 @@ module.exports = function(grunt) {
         },
         files: {
         }
+      },
+      umd: {
+        files: [{
+          expand: true,
+          cwd: 'src/js/modules',
+          src: ['*.js', '!*.min.js'],
+          dest: 'dist/js/umd',
+          ext: '.js'
+        }]
       }
     },
     webpack: {
       build: {
         entry: {
-          slider: ['./src/js/slider']
+          "slider": ['./src/js/slider'],
+          // "page-flip": ['./src/js/page-flip']
         },
         output: {
           path: 'dist/js',
@@ -51,7 +61,8 @@ module.exports = function(grunt) {
       },
       target: {
         files: {
-          'dist/js/slider.min.js': ['dist/js/slider.umd.js']
+          'dist/js/slider.min.js': ['dist/js/slider.umd.js'],
+          'dist/js/page-flip.min.js': ['dist/js/page-flip.umd.js']
         }
       }
     },
@@ -59,7 +70,7 @@ module.exports = function(grunt) {
       tar: {
         expand: true,
         cwd: 'dist',
-        src: 'js/*',
+        src: '/js/umd/*',
         dest: 'example/assets',
       }
     },
@@ -113,4 +124,5 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask("build", ["image","sass","webpack","uglify","copy"]);
+  grunt.registerTask("build-js", ["webpack","uglify","copy"]);
 };

@@ -38,6 +38,12 @@ body {
   }
 }
 
+body.test2 {
+  .container {
+    margin: 0;
+  }
+}
+
 @media (max-width: 600px) {
   body .container {
     width: 100%;

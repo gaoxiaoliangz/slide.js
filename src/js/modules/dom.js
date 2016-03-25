@@ -78,11 +78,43 @@ const Dom = (() => {
     }
 
     height(height) {
-      let _height = function(ele, width) {
+      let _height = function(ele, height) {
         // todo: add height check
         ele.style.height = height + "px"
       }
       this._handleDomArray(_height, arguments)
+
+      return this
+    }
+
+    left(left) {
+      let _left = function(ele, left) {
+        // todo: add height check
+        ele.style.left = left + "px"
+      }
+      this._handleDomArray(_left, arguments)
+
+      return this
+    }
+
+    right(right) {
+      let _right = function(ele, right) {
+        // todo: add height check
+        ele.style.right = right + "px"
+      }
+      this._handleDomArray(_right, arguments)
+
+      return this
+    }
+
+    setVerticalCenter() {
+      let _setEleVerticalCenter = function(ele) {
+        let height = ele.clientHeight
+        ele.style.marginTop = -height/2 + "px"
+        ele.style.top = "50%"
+        ele.style.position = "absolute"
+      }
+      this._handleDomArray(_setEleVerticalCenter, arguments)
 
       return this
     }
@@ -95,4 +127,4 @@ const Dom = (() => {
   return newDom
 })()
 
-export default Dom
+module.exports = Dom

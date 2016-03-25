@@ -4,7 +4,8 @@ var hot = 'webpack-hot-middleware/client'
 
 module.exports = {
   entry: {
-    test: ['./src/js/test']
+    test: ['./src/js/test'],
+    test2: ['./src/js/test2']
   },
   output: {
     path: path.join(__dirname, 'example/assets/js'),

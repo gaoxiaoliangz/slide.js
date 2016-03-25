@@ -407,6 +407,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	// export default Slider
 	module.exports = Slider;
 
+	// export { Dom, Util }
+
+	// export
+
 /***/ },
 /* 2 */
 /***/ function(module, exports) {
@@ -552,11 +556,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	      key: "height",
 	      value: function height(_height2) {
-	        var _height = function _height(ele, width) {
+	        var _height = function _height(ele, height) {
 	          // todo: add height check
-	          ele.style.height = _height2 + "px";
+	          ele.style.height = height + "px";
 	        };
 	        this._handleDomArray(_height, arguments);
+
+	        return this;
+	      }
+	    }, {
+	      key: "left",
+	      value: function left(_left2) {
+	        var _left = function _left(ele, left) {
+	          // todo: add height check
+	          ele.style.left = left + "px";
+	        };
+	        this._handleDomArray(_left, arguments);
+
+	        return this;
+	      }
+	    }, {
+	      key: "right",
+	      value: function right(_right2) {
+	        var _right = function _right(ele, right) {
+	          // todo: add height check
+	          ele.style.right = right + "px";
+	        };
+	        this._handleDomArray(_right, arguments);
+
+	        return this;
+	      }
+	    }, {
+	      key: "setVerticalCenter",
+	      value: function setVerticalCenter() {
+	        var _setEleVerticalCenter = function _setEleVerticalCenter(ele) {
+	          var height = ele.clientHeight;
+	          ele.style.marginTop = -height / 2 + "px";
+	          ele.style.top = "50%";
+	          ele.style.position = "absolute";
+	        };
+	        this._handleDomArray(_setEleVerticalCenter, arguments);
 
 	        return this;
 	      }
