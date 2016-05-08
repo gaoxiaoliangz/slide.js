@@ -19,7 +19,7 @@ In this version, jQuery is removed. It's now vanilla js using ES2015 style of co
 Slider(selector, config)
 
 ### selector
-`selector` is the target DOM selector where you wanna put content in.
+`selector` is the target DOM selector where you wanna put content.
 
 ### config
 | option name | values | description |
