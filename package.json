@@ -4,7 +4,7 @@
   "description": "Easy to use slide show",
   "author": "gaoxiaoliangz",
   "license": "MIT",
-  "homepage": "https://github.com/gaoxiaoliangz/slider#readme",
+  "homepage": "https://github.com/gaoxiaoliangz/slider.js#readme",
   "scripts": {
     "start": "node ./server",
     "build-js": "BABEL_ENV=production grunt build-js",
