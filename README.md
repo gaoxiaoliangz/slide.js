@@ -1,6 +1,7 @@
 
-# Slider
-It's an easy to use slider. In the next version I may make this to work with React.
+# slider.js
+
+Easy to use slider
 
 ## Usage
 
@@ -10,10 +11,7 @@ var s = new Slider(".your-slider-class",{
 })
 ```
 
-~~Or you can you use Outliner in the jQuery style~~
-
 In this version of Slider.js, jQuery is removed. It's now vanilla js using ES2015 style of coding, even the dom manipulation part. I wrote a very small lib called dom.js to handle tasks like `addClass`, `removeClass`, `eq` , etc. It behaves just like jQuery, but more compact.
-
 
 ## Parameters
 Slider(selector, config)
