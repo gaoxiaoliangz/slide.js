@@ -1,5 +1,6 @@
 import Util from "./util"
 import _D from "./dom"
+import './slide.scss'
 
 const Slide = (() => {
 
@@ -299,10 +300,4 @@ const Slide = (() => {
   return Slide
 })()
 
-/*
- * when using es2015 style of exporting, webpack put the output under default property, which is not what I want
- * so as long as webpack keeping doing so, old-fashioned way of exporting is used
- */
-
-// export default Slide
-module.exports = Slide
+export default Slide

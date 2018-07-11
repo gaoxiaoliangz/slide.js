@@ -1,0 +1,56 @@
+body {
+  h1 {
+    margin: 50px 0;
+    font-size: 30px;
+  }
+}
+
+body.test2 .container {
+  margin: 0;
+}
+
+.container img {
+  max-width: 100%;
+}
+
+.container {
+  width: 800px;
+  margin: 0 auto;
+}
+
+.content {
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.s1,.s2,.s3,.s4,.s5 {
+  width: 100%;
+  height: 500px;
+  box-shadow: 0 15px 60px rgba(0, 0, 0, 0.23);
+}
+
+.s1 {
+  background: #d17312;
+}
+
+.s2 {
+  background: #70b61e;
+}
+
+.s3 {
+  background: #2656b3;
+}
+
+.s4 {
+  background: #241569;
+}
+
+.s5 {
+  background: #6c25b3;
+}
+
+@media (max-width: 600px) {
+  body .container {
+    width: 100%;
+  }
+}

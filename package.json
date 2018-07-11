@@ -6,7 +6,25 @@
   "license": "MIT",
   "homepage": "https://github.com/gaoxiaoliangz/slide.js#readme",
   "scripts": {
-    "dev": "webpack --config webpack.dev.config.js --watch",
-    "build": "webpack --config webpack.prod.config.js"
+    "start": "jellyweb serve",
+    "build": "jellyweb build"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-plugin-lodash": "^3.3.4",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^1.0.0",
+    "file-loader": "^1.1.11",
+    "isomorphic-style-loader": "^4.0.0",
+    "jellyweb": "^0.6.2",
+    "node-sass": "^4.9.2",
+    "sass-loader": "^7.0.3",
+    "style-loader": "^0.21.0",
+    "url-loader": "^1.0.1"
   }
 }
