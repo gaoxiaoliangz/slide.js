@@ -7,6 +7,7 @@
   "homepage": "https://github.com/gaoxiaoliangz/slide.js#readme",
   "scripts": {
     "start": "jellyweb serve",
+    "prebuild": "rm -rf build",
     "build": "jellyweb build"
   },
   "devDependencies": {

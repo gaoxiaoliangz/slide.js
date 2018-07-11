@@ -6,7 +6,7 @@ module.exports = {
   },
   output: {
     path: resolveProject('build'),
-    filename: '[name]-[hash:8].js',
+    filename: '[name].js',
     publicPath: '/',
     library: 'Slide',
     libraryTarget: 'umd',
@@ -21,6 +21,8 @@ module.exports = {
       dataUrl: true
     },
     production: true,
-    scopedClassName: '[hash:base64:8]'
+    extractCss: {
+      filename: 'slide.css'
+    }
   })
 }
