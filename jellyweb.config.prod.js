@@ -5,7 +5,7 @@ module.exports = {
     main: resolveProject('src/index.js'),
   },
   output: {
-    path: resolveProject('build'),
+    path: resolveProject('dist'),
     filename: '[name].js',
     publicPath: '/',
     library: 'Slide',
