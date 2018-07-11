@@ -29,3 +29,12 @@ Slider(selector, config)
 | aspectRatio | 8/5 | define the aspect ratio of the slide area |
 | animationTime | 500 | define how long the animation lasts, the shorter the faster |
 | style | `style-flat`(default), `style-cubic` | support two different styles for now |
+
+## Run example
+
+```
+npm install
+npm start
+```
+
+then open  <http://localhost:4006/index.html> and <http://localhost:4006/pageflip.html>

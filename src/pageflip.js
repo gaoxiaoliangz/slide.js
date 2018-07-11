@@ -105,4 +105,4 @@ const PageFlip = (() => {
   return PageFlip
 })()
 
-module.exports = PageFlip
+export default PageFlip
