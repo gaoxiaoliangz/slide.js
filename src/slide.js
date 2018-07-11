@@ -1,7 +1,7 @@
 import Util from "./util"
 import _D from "./dom"
 
-const Slider = (() => {
+const Slide = (() => {
 
   const VERSION = "0.2.0"
 
@@ -24,22 +24,22 @@ const Slider = (() => {
   }
 
   const classNames = {
-    name: 'slider',
-    slide: 'slider-slide',
-    wrap: 'slider-wrap',
+    name: 'slide',
+    slide: 'slide-slide',
+    wrap: 'slide-wrap',
     active: 'active',
-    container: 'slider-container',
-    prevSlide: 'slider-slide-prev',
-    nextSlide: 'slider-slide-next',
-    dotNav: 'slider-dot-nav',
-    arrowNav: 'slider-arrow-nav',
-    prev: 'slider-nav-prev',
-    next: 'slider-nav-next',
+    container: 'slide-container',
+    prevSlide: 'slide-slide-prev',
+    nextSlide: 'slide-slide-next',
+    dotNav: 'slide-dot-nav',
+    arrowNav: 'slide-arrow-nav',
+    prev: 'slide-nav-prev',
+    next: 'slide-nav-next',
   }
 
   const ZINDEX = 50
 
-  class Slider {
+  class Slide {
 
     static get version() {
       return VERSION
@@ -50,7 +50,7 @@ const Slider = (() => {
       this.config = Object.assign({}, defaultConfig, config)
       this.validateConfig(this.config)
 
-      this.sliderDom = document.querySelector(selector)
+      this.slideDom = document.querySelector(selector)
       this.slides = document.querySelectorAll(`${selector}>div`)
 
       this.length = this.slides.length;
@@ -61,7 +61,7 @@ const Slider = (() => {
       this.touchstartX = 0;
 
       this.buildDom()
-      this.setSliderSize()
+      this.setSlideSize()
       this.addListeners()
       this.setSlidesPosition(this.activeIndex)
       this.autoplay()
@@ -91,14 +91,14 @@ const Slider = (() => {
       }.bind(this))
 
       // touch support
-      this.sliderWrap.addEventListener("touchstart", function(e){
+      this.slideWrap.addEventListener("touchstart", function(e){
         clearInterval(this.autoplaySlides)
         this.handleTouch(e)
       }.bind(this))
-      this.sliderWrap.addEventListener("touchmove", function(e){
+      this.slideWrap.addEventListener("touchmove", function(e){
         this.handleTouch(e)
       }.bind(this))
-      this.sliderWrap.addEventListener("touchend", function(e){
+      this.slideWrap.addEventListener("touchend", function(e){
         this.handleTouch(e)
       }.bind(this))
     }
@@ -164,7 +164,7 @@ const Slider = (() => {
 
       this.dotNav = dotNav
       this.arrowNav = arrowNav
-      this.sliderWrap = wrap
+      this.slideWrap = wrap
 
       // prepare slides
       wrap.className = classNames.wrap
@@ -172,14 +172,14 @@ const Slider = (() => {
         slide.className += ` ${classNames.slide}`
         wrap.appendChild(slide)
       })
-      this.sliderDom.className += ` ${classNames.container} ${classNames.name}-${this.config.style}`
-      this.sliderDom.appendChild(wrap)
+      this.slideDom.className += ` ${classNames.container} ${classNames.name}-${this.config.style}`
+      this.slideDom.appendChild(wrap)
 
       // dot nav
       if(this.config.hasDotNav){
         dotNav.className += ` ${classNames.dotNav}`
         dotNav.innerHTML = "<ul></ul>"
-        this.sliderDom.appendChild(dotNav)
+        this.slideDom.appendChild(dotNav)
 
         for(let i = 0;i < this.length;i++){
           let dotNavLi = document.createElement("li")
@@ -194,16 +194,16 @@ const Slider = (() => {
       if(this.config.hasArrowNav){
         arrowNav.innerHTML = `<ul><li class=${classNames.prev}><a href="#"></a></li><li class=${classNames.next}><a href="#"></a></li></ul>`
         arrowNav.className = classNames.arrowNav
-        this.sliderDom.appendChild(arrowNav)
+        this.slideDom.appendChild(arrowNav)
       }
       this.arrowNavBtn = this.arrowNav.querySelectorAll("a")
     }
 
-    setSliderSize() {
-      this.width = this.sliderDom.getBoundingClientRect().width
+    setSlideSize() {
+      this.width = this.slideDom.getBoundingClientRect().width
       this.height = this.width/this.config.aspectRatio
 
-      _D(this.sliderWrap).width(this.width).height(this.height)
+      _D(this.slideWrap).width(this.width).height(this.height)
       _D(this.slides).width(this.width).height(this.height)
     }
 
@@ -296,7 +296,7 @@ const Slider = (() => {
     }
   }
 
-  return Slider
+  return Slide
 })()
 
 /*
@@ -304,5 +304,5 @@ const Slider = (() => {
  * so as long as webpack keeping doing so, old-fashioned way of exporting is used
  */
 
-// export default Slider
-module.exports = Slider
+// export default Slide
+module.exports = Slide

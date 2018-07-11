@@ -1,6 +1,5 @@
-import Slider from './slider'
+import Slide from './slide'
 import _D from './dom'
-import Util from './util'
 
 const classNames = {
   name: 'page-flip',
@@ -20,7 +19,7 @@ let scrollTimeArray = []
 
 const PageFlip = (() => {
 
-  class PageFlip extends Slider {
+  class PageFlip extends Slide {
     constructor(selector, config){
       config.hasArrowNav = false
       config.autoplay = false
@@ -29,13 +28,13 @@ const PageFlip = (() => {
 
       this.rebuildDom()
       this.layoutElements()
-      this.setSliderSize()
+      this.setSlideSize()
       this.addListeners2()
     }
 
     addListeners2() {
       window.addEventListener("resize", function() {
-        this.setSliderSize()
+        this.setSlideSize()
       }.bind(this))
       this._handleScrollEvents(this.handleFlipScroll)
     }
@@ -70,11 +69,11 @@ const PageFlip = (() => {
       }.bind(this))
     }
 
-    setSliderSize() {
+    setSlideSize() {
       this.width = document.documentElement.clientWidth
       this.height = document.documentElement.clientHeight
 
-      _D(this.sliderWrap).width(this.width).height(this.height)
+      _D(this.slideWrap).width(this.width).height(this.height)
       _D(this.slides).width(this.width).height(this.height)
       _D(document.body).width(this.width).height(this.height)
     }
@@ -84,7 +83,7 @@ const PageFlip = (() => {
     }
 
     rebuildDom() {
-      _D(this.sliderDom).addClass(classNames.container)
+      _D(this.slideDom).addClass(classNames.container)
     }
 
     setSlidePosition(index, top, offset, isAnimated) {

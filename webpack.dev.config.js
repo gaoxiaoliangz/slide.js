@@ -1,6 +1,5 @@
 var path = require('path')
 var webpack = require('webpack')
-var hot = 'webpack-hot-middleware/client'
 
 module.exports = {
   entry: {
@@ -38,4 +37,4 @@ module.exports = {
     },
     extensions: ['', '.js']
   }
-};
+}
