@@ -1,23 +1,23 @@
 
-# slider.js
+# slide.js
 
-Easy to use slider
+Easy to use slide
 
 ## Usage
 
 ```
-var s = new Slider(".your-slider-class",{
+var s = new Slide(".your-slide-class",{
   autoplay: true
 })
 ```
 
-In this version of Slider.js, jQuery is removed. It's now vanilla js using ES2015 style of coding, even the dom manipulation part. I wrote a very small lib called dom.js to handle tasks like `addClass`, `removeClass`, `eq` , etc. It behaves just like jQuery, but more compact.
+In this version of Slide.js, jQuery is removed. It's now vanilla js using ES2015 style of coding, even the dom manipulation part. I wrote a very small lib called dom.js to handle tasks like `addClass`, `removeClass`, `eq` , etc. It behaves just like jQuery, but more compact.
 
 ## Parameters
-Slider(selector, config)
+Slide(selector, config)
 
 ### selector
-`selector` is the target DOM selector that you want Slider to put its content in.
+`selector` is the target DOM selector that you want Slide to put its content in.
 
 ### config
 | option name | values | description |
