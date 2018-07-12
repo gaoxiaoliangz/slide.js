@@ -2,13 +2,13 @@ $text_1: #222;
 $text_2: #666;
 $text_3: #999;
 
-.slider-container {
+.slide-container {
   position: relative;
   height: 100%;
-  .slider-wrap {
+  .slide-wrap {
     position: relative;
     overflow: hidden;
-    .slider-slide {
+    .slide-slide {
       position: absolute;
       top: 0;
       left: 0;
@@ -18,11 +18,11 @@ $text_3: #999;
         display: inline-block;
       }
     }
-    .slider-slide.active {
+    .slide-slide.active {
       z-index: 60;
     }
   }
-  .slider-dot-nav {
+  .slide-dot-nav {
     width: 100%;
     position: absolute;
     left: 0;
@@ -66,42 +66,60 @@ $text_3: #999;
       }
     }
   }
-  .slider-arrow-nav {
+  .slide-arrow-nav {
     ul {
       list-style: none;
       margin: 0;
       padding: 0;
       li a {
         width: 30px;
-        height: 70px;
+        height: 30px;
         display: inline-block;
         position: absolute;
         cursor: pointer;
         background-size: 20px !important;
-        margin-top: -35px;
+        margin-top: -15px;
         top: 50%;
-        padding: 0 15px;
         opacity: .6;
         transition: all 500ms;
         z-index: 110;
         &:hover {
           opacity: 1;
         }
+        &:before {
+          margin: 0;
+          content: " ";
+          display: block;
+          width: 21.2px;
+          height: 21.2px;
+          position: absolute;
+          top: 4.4px;
+        }
       }
-      li.slider-nav-prev a {
-        left: 0;
-        background: url(../img/slider-nav-arrow-left.png) no-repeat center;
+      li.slide-nav-prev a {
+        left: 10px;
+        &:before {
+          left: 4.4px;
+          border-left: 1px solid #ddd;
+          border-bottom: 1px solid #ddd;
+          transform: rotate(45deg)
+        }
       }
-      li.slider-nav-next a {
-        right: 0;
-        background: url(../img/slider-nav-arrow-right.png) no-repeat center;
+      li.slide-nav-next a {
+        right: 10px;
+        &:before {
+          right: 4.4px;
+          border-right: 1px solid #ddd;
+          border-top: 1px solid #ddd;
+          transform: rotate(45deg);
+        }
       }
     }
   }
 }
-.slider-style-cubic {
+.slide-style-cubic {
   overflow: hidden;
-  .slider-wrap {
+  .slide-wrap {
     transform: scale(.333,.333);
     overflow: visible;
   }
@@ -111,7 +129,7 @@ $text_3: #999;
   position: fixed;
   left: 0;
   top: 0;
-  .slider-dot-nav {
+  .slide-dot-nav {
     left: 15px;
     ul {
       width: 30px;
