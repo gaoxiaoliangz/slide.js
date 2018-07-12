@@ -5,7 +5,7 @@ Easy to use slide
 
 ## Usage
 
-```
+```js
 var s = new Slide(".your-slide-class",{
   autoplay: true
 })
