@@ -1,7 +1,7 @@
 
 # slide.js
 
-Easy to use slide
+Easy to use carousel, simple mark-up with just enough flexibality
 
 ## Usage
 
